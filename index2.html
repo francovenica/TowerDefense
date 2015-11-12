@@ -24,13 +24,8 @@ canvas{
 <script>
 var ctx = document.getElementById("ctx").getContext("2d");
 var stats = document.getElementById("stats").getContext("2d");
-var MAX_ENEMY_AMOUNT = 10;
-var NEXT_WAVE_TIMER = 8000;
-var NEXT_SPAWN_TIMER = 500;
-var currentEnemies = 0;
 var currentActiveWave = 0;
-var spawnTimer = (new Date()).getTime();
-var waveTimer = (new Date()).getTime();
+var globalTimer = (new Date()).getTime();
 var outBoundaries = 525; //el ancho y alto de la pantalla es 500, por eso fuera es un poco mas alla de 500
 var fps = 10;
 var C_HEIGHT = 500;
@@ -68,29 +63,38 @@ var wave = function(id, amountEnemies, spawnTime, enemyPosX, enemyPosY, enemyNex
 		id: id,
 		amountEnemies:amountEnemies,
 		spawnTime:spawnTime,
+		lastCreatedDate: 0,
 		active: false,
+		keepCreating: true,
 	}
 	
-	w.enemies;
+	w.enemies = [];
+	w.enemyForStats;
 	
-	w.generateEnemies = function(enemyPosX, enemyPosY, enemyNextX, enemyNextY){
+	w.generateEnemies = function(){
 		//para hacer variar a los monstruos un poco hasta que realice objetos mejor hechos.
-		var spd = Math.floor((Math.random() * 3) + 1);
+		var spd = Math.floor((Math.random() * 2) + 1);
 		var colors = ["blue", "#5B00B5", "#009999", "black"];
 		var colorSelected = Math.floor((Math.random() * colors.length));
 		var health = Math.floor((Math.random() * 15) + 5);
 		var gold = health * 2;
-		var damage = health / 4;
+		var damage = 1;
 		
+		w.enemyForStats = enemy(-500, -500, 0, 0, spd, colors[colorSelected], health, gold, damage);
+		//este enemigo suelto es para mostrarlo en la barra de stats.
 		
 		for ( var i = 0; i < w.amountEnemies ; i++){
-		
-		w.enemies.push(enemy(enemyPosX, enemyPosY - i * 25, enemyNextX, enemyNextY, spd, colors[colorSelected], health, gold, damage));
+		w.enemies.push(enemy(enemyPosX, enemyPosY - i * 40, enemyNextX, enemyNextY, spd, colors[colorSelected], health, gold, damage));
 		}
+		
 	}
 	
 	w.setActiveInactive = function(){
 		w.active = !w.active;
+	}
+	
+	w.keepStopCreating = function(){
+	w.keepCreating = !w.keepCreating;
 	}
 	
 	return w;
@@ -305,13 +309,13 @@ var genMap = function(){
 };
 
 map1 = genMap();
-wave s = []; 
+waves = []; 
 enemies = [];
 towers = [];
 gTower = ghostTower(-50,-50); //posx, posy, range
 player = player();
 
-window.addEventListener('focus',setInterval(update,fps),false); //update solo se debe ejecutar si la tab esta visible
+window.addEventListener('focus',setInterval(update,fps)); //update solo se debe ejecutar si la tab esta visible
 
 
 //-+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+---//
@@ -353,10 +357,14 @@ document.onclick = function(event){
 	if (x> 10 && x <60 && y > 455 && y < 505)
 	{//si hago click en el boton Play de abajo.
 	
-		if (waves[currentActiveWave] !== "undefined" && waves[currentActiveWave].length == 0)
+		/*if (waves[currentActiveWave] != undefined && waves[currentActiveWave].length == 0)
+		{
 		currentActiveWave++;
+		console.log("current = " + currentActiveWave);
+		}*/
 		
-		if(waves[currentActiveWave] === "undefined"){
+		
+		if(waves[currentActiveWave] == undefined){
 		var amountEnemies = Math.floor((Math.random() * 5) + 10);
 		waves.push(wave( (currentActiveWave + 1) , amountEnemies, 500, map1.x[0], map1.y[0], map1.x[1], map1.y[1]));
 		waves[currentActiveWave].setActiveInactive();
@@ -396,77 +404,106 @@ function update(){
 	
 	drawMap(map1);
 	drawPlayButton();
+
+
+	if (waves[currentActiveWave] != undefined && waves[currentActiveWave].active){
 	
-	if(waves[currentActiveWave] !== "undefined") 
-		if (waves[currentActiveWave].active){
-
-			for(var key in waves[currentActiveWave].enemies)
-			{
-				if ( waves[currentActiveWave].enemies[key].direction == "horizontal" && typeof waves[currentActiveWave].enemies[key].nextX !== 'undefined')
-					{
-						(waves[currentActiveWave].enemies[key].nextX - waves[currentActiveWave].enemies[key].posX > 0)? 
-						waves[currentActiveWave].enemies[key].posX += waves[currentActiveWave].enemies[key].spd : 
-						waves[currentActiveWave].enemies[key].posX -= waves[currentActiveWave].enemies[key].spd;
-						
-						if ( Math.abs(waves[currentActiveWave].enemies[key].nextX - waves[currentActiveWave].enemies[key].posX) < 
-						waves[currentActiveWave].enemies[key].spd) 
-						waves[currentActiveWave].enemies[key].posX = waves[currentActiveWave].enemies[key].nextX;
-						
-						waves[currentActiveWave].enemies[key].nextX == waves[currentActiveWave].enemies[key].posX ? 
-						waves[currentActiveWave].enemies[key].direction = "vertical": 
-						waves[currentActiveWave].enemies[key].direction ;
-					}
-				else if ( waves[currentActiveWave].enemies[key].direction == "vertical"	&& typeof waves[currentActiveWave].enemies[key].nextY !== 'undefined')
-					{
-						(waves[currentActiveWave].enemies[key].nextY - waves[currentActiveWave].enemies[key].posY > 0)? 
-						waves[currentActiveWave].enemies[key].posY += waves[currentActiveWave].enemies[key].spd : 
-						waves[currentActiveWave].enemies[key].posY -= waves[currentActiveWave].enemies[key].spd;
-						
-						if ( Math.abs(waves[currentActiveWave].enemies[key].nextY - waves[currentActiveWave].enemies[key].posY) < 
-						waves[currentActiveWave].enemies[key].spd) 
-						waves[currentActiveWave].enemies[key].posY = waves[currentActiveWave].enemies[key].nextY;
-						
-						waves[currentActiveWave].enemies[key].nextY == waves[currentActiveWave].enemies[key].posY ? 
-						waves[currentActiveWave].enemies[key].direction = "horizontal": 
-						waves[currentActiveWave].enemies[key].direction ;
-					}
-				else;
-
-				if ( waves[currentActiveWave].enemies[key].posY == waves[currentActiveWave].enemies[key].nextY &&  waves[currentActiveWave].enemies[key].posX == waves[currentActiveWave].enemies[key].nextX && waves[currentActiveWave].enemies[key].movement + 1 < map1.x.length)
-					{
-						waves[currentActiveWave].enemies[key].movement++;
-						waves[currentActiveWave].enemies[key].posX = waves[currentActiveWave].enemies[key].nextX;
-						waves[currentActiveWave].enemies[key].posY = waves[currentActiveWave].enemies[key].nextY;
-						waves[currentActiveWave].enemies[key].nextX = map1.x[waves[currentActiveWave].enemies[key].movement+1];
-						waves[currentActiveWave].enemies[key].nextY = map1.y[waves[currentActiveWave].enemies[key].movement+1];
-					}
+		if ( (globalTimer - waves[currentActiveWave].lastCreatedDate) > waves[currentActiveWave].spawnTime &&
+		waves[currentActiveWave].amountEnemies > waves[currentActiveWave].enemies.length && waves[currentActiveWave].keepCreating)
+		{
+		//console.log("enemigos en la oleada " + currentActiveWave + " = " + waves[currentActiveWave].enemies.length + " - " + waves[currentActiveWave].lastCreatedDate);
+		//console.log("Global = " + globalTimer + " -  lastCreted =  " + waves[currentActiveWave].lastCreatedDate + " = " + (globalTimer - waves[currentActiveWave].lastCreatedDate) );
+		waves[currentActiveWave].generateEnemies();
+		waves[currentActiveWave].lastCreatedDate = globalTimer;
+		if ( waves[currentActiveWave].amountEnemies == waves[currentActiveWave].enemies.length){
+			waves[currentActiveWave].keepStopCreating(); 
+			//keepCreating va a pasar a false una vez que consegui generar todos los bichos y no va a crear mas
+		}
+		}
+		for(var key in waves[currentActiveWave].enemies)
+		{
+			if ( waves[currentActiveWave].enemies[key].direction == "horizontal" && 
+			typeof waves[currentActiveWave].enemies[key].nextX !== 'undefined')
+				{
+					(waves[currentActiveWave].enemies[key].nextX - waves[currentActiveWave].enemies[key].posX > 0)? 
+					waves[currentActiveWave].enemies[key].posX += waves[currentActiveWave].enemies[key].spd : 
+					waves[currentActiveWave].enemies[key].posX -= waves[currentActiveWave].enemies[key].spd;
 					
-				drawEntity(waves[currentActiveWave].enemies[key]);
+					if ( Math.abs(waves[currentActiveWave].enemies[key].nextX - waves[currentActiveWave].enemies[key].posX) < 
+					waves[currentActiveWave].enemies[key].spd) 
+					waves[currentActiveWave].enemies[key].posX = waves[currentActiveWave].enemies[key].nextX;
+					
+					waves[currentActiveWave].enemies[key].nextX == waves[currentActiveWave].enemies[key].posX ? 
+					waves[currentActiveWave].enemies[key].direction = "vertical": 
+					waves[currentActiveWave].enemies[key].direction ;
+				}
+			else if ( waves[currentActiveWave].enemies[key].direction == "vertical"	&& 
+			typeof waves[currentActiveWave].enemies[key].nextY !== 'undefined')
+				{
+					(waves[currentActiveWave].enemies[key].nextY - waves[currentActiveWave].enemies[key].posY > 0)? 
+					waves[currentActiveWave].enemies[key].posY += waves[currentActiveWave].enemies[key].spd : 
+					waves[currentActiveWave].enemies[key].posY -= waves[currentActiveWave].enemies[key].spd;
+					
+					if ( Math.abs(waves[currentActiveWave].enemies[key].nextY - waves[currentActiveWave].enemies[key].posY) < 
+					waves[currentActiveWave].enemies[key].spd) 
+					waves[currentActiveWave].enemies[key].posY = waves[currentActiveWave].enemies[key].nextY;
+					
+					waves[currentActiveWave].enemies[key].nextY == waves[currentActiveWave].enemies[key].posY ? 
+					waves[currentActiveWave].enemies[key].direction = "horizontal": 
+					waves[currentActiveWave].enemies[key].direction ;
+				}
+			else;
+
+			if ( waves[currentActiveWave].enemies[key].posY == waves[currentActiveWave].enemies[key].nextY &&
+			waves[currentActiveWave].enemies[key].posX == waves[currentActiveWave].enemies[key].nextX && 
+			waves[currentActiveWave].enemies[key].movement + 1 < map1.x.length)
+				{
+					waves[currentActiveWave].enemies[key].movement++;
+					waves[currentActiveWave].enemies[key].posX = waves[currentActiveWave].enemies[key].nextX;
+					waves[currentActiveWave].enemies[key].posY = waves[currentActiveWave].enemies[key].nextY;
+					waves[currentActiveWave].enemies[key].nextX = map1.x[waves[currentActiveWave].enemies[key].movement+1];
+					waves[currentActiveWave].enemies[key].nextY = map1.y[waves[currentActiveWave].enemies[key].movement+1];
+				}
+				
+			drawEntity(waves[currentActiveWave].enemies[key]);
 
 
-				if (waves[currentActiveWave].enemies[key].posY > outBoundaries || waves[currentActiveWave].enemies[key].posX > outBoundaries)
-					{
-						player.reduceLives(waves[currentActiveWave].enemies[key].damage);
-						waves[currentActiveWave].enemies.splice(key,1); //la funcion que borra el elemento tiene que estar a lo ultimo del for()
-					}
+			if (waves[currentActiveWave].enemies[key].posY > outBoundaries || waves[currentActiveWave].enemies[key].posX > outBoundaries)
+				{
+					player.reduceLives(waves[currentActiveWave].enemies[key].damage);
+					waves[currentActiveWave].enemies.splice(key,1); //la funcion que borra el elemento tiene que estar a lo ultimo del for()
+				}
 
-				if(waves[currentActiveWave].enemies.length > 0&& waves[currentActiveWave].enemies[key].health <= 0){
-						player.gettingMoneyFromEnemy(waves[currentActiveWave].enemies[key].gold);
-						waves[currentActiveWave].enemies.splice(key,1); //la funcion que borra el elemento tiene que estar a lo ultimo del for()
-					}
-			} //end for()
-		} //end if para wave active
+			if(waves[currentActiveWave].enemies.length > 0 && waves[currentActiveWave].enemies[key].health <= 0){
+					player.gettingMoneyFromEnemy(waves[currentActiveWave].enemies[key].gold);
+					waves[currentActiveWave].enemies.splice(key,1); //la funcion que borra el elemento tiene que estar a lo ultimo del for()
+				}
+		} //end for()
+		
+		if ( waves[currentActiveWave].enemies.length == 0)
+		{
+			waves[currentActiveWave].setActiveInactive();
+			currentActiveWave++;
+			//Una vez que todos los enemigos son destruidos o cruzan el camino la wave actual se desactiva y se pasa a la siguiente que se
+			//va a activar con un nuevo click
+		}
+		
+	} //end if para wave active
+	
 	
 	for ( var key in towers){
 		towers[key].drawEntity();
 		
-		for(var key2 in waves[currentActiveWave].enemies){
-			if(towers[key].detectEnemy(waves[currentActiveWave].enemies[key2]))
-			if ( new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
-				{
-					towers[key].shootBullet(waves[currentActiveWave].enemies[key2]);
-					towers[key].lastAttack = new Date().getTime();
-				};	
+		if( waves[currentActiveWave] != undefined)
+		{
+			for(var key2 in waves[currentActiveWave].enemies){
+				if(towers[key].detectEnemy(waves[currentActiveWave].enemies[key2]))
+				if ( new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
+					{
+						towers[key].shootBullet(waves[currentActiveWave].enemies[key2]);
+						towers[key].lastAttack = new Date().getTime();
+					};	
+			}
 		}
 		
 		for(var key3 in towers[key].myBullets)
@@ -478,7 +515,8 @@ function update(){
 				towers[key].myBullets.splice(key3,1);
 		}
 	}
-
+	
+	
 	if ( typeof gTower !== "undefined" && player.optionTowerSelected != "0"){
 		switch (player.optionTowerSelected){
 			case "1":
@@ -491,6 +529,7 @@ function update(){
 		gTower.drawEntity();
 	}
 	
+	globalTimer = (new Date()).getTime();
 }
 
 
@@ -528,36 +567,50 @@ drawStats = function(money, lives){
 	stats.save();
 	stats.fillStyle = "white";
 	stats.font = "20px Georgia"
-	stats.fillText("Money: " + money, 20, 50);
 	stats.fillText("Lives: " + lives, 20, 30);
-	
+	stats.fillText("Money: " + money, 20, 50);
+	if ( waves[currentActiveWave] != undefined && waves[currentActiveWave].enemyForStats != undefined)
+	{
+	stats.fillText("Wave: " + waves[currentActiveWave].id, 20, 70);
+	stats.fillText("Current Enemy:", 20, 100);
+	stats.fillText("Health: " + waves[currentActiveWave].enemyForStats.health , 20, 120);
+	stats.fillText("Speed: " + waves[currentActiveWave].enemyForStats.spd , 20, 140);
+	stats.fillText("Gold: " + waves[currentActiveWave].enemyForStats.gold , 20, 160);
+	stats.fillText("Damage: " + waves[currentActiveWave].enemyForStats.damage , 20, 180);
+	}
+	else
+	{
+	stats.fillText("Wave: 0", 20, 70);
+	}	
 	
 	stats.fillStyle = "red";
 	if (player.optionTowerSelected == "1"){
-		stats.fillRect(20,100,40,40);
+		stats.fillRect(20,300,40,40);
 	}
 	else if(player.optionTowerSelected == "2"){
-		stats.fillRect(20,160,40,40);
+		stats.fillRect(20,360,40,40);
 	}
 	
 	stats.strokeStyle = "white";
 	stats.fillStyle = "white";
-	stats.strokeRect(20,100,40,40);
+	stats.strokeRect(20,300,40,40);
 	stats.font = "30px Georgia"
-	stats.fillText("1", 33, 126);
+	stats.fillText("1", 33, 326);
 	if (money < 250)
 		stats.fillStyle = "red";
 	stats.font = "20px Georgia";
-	stats.fillText("250 gold", 73, 126);
+	stats.fillText("250 gold", 73, 326);
 	
 	stats.fillStyle = "white";
-	stats.strokeRect(20,160,40,40);
+	stats.strokeRect(20,360,40,40);
 	stats.font = "30px Georgia"
-	stats.fillText("2", 32, 187);
+	stats.fillText("2", 32, 387);
 	if (money < 600)
 		stats.fillStyle = "red";
 	stats.font = "20px Georgia";
-	stats.fillText("600 gold", 73, 187);
+	stats.fillText("600 gold", 73, 387);
+	
+	
 	
 	stats.restore();
 
