@@ -32,370 +32,27 @@ var C_HEIGHT = 500;
 var C_WIDTH = 500;
 
 </script>
+
+<script src="js/player_ent.js"></script>
+<script src="js/wave_ent.js"></script>
+<script src="js/enemy_ent.js"></script>
+<script src="js/towers_ent.js"></script>
+<script src="js/ghostTower_ent.js"></script>
+<script src="js/bullet_ent.js"></script>
+<script src="js/genMap_ent.js"></script>
+<script src="js/docFunctions.js"></script>
+<script src="js/drawFunctions.js"></script>
+
 <script>
-var player = function(){
-	var p = {
-		lives: 20,
-		money: 500,
-		optionTowerSelected: "0",
-	};
-	
-	p.buyingTower = function(price){
-		p.money -= price;
-	}
-	
-	p.gettingMoneyFromEnemy = function(amount){
-		p.money += amount;
-	}
-	
-	p.reduceLives = function(damage){
-		p.lives -= damage;
-	}
-	
-	p.setOptionTowerSelected = function(value){
-		p.optionTowerSelected = value;
-	}
-	
-	return p;
-}
-
-var wave = function(id, amountEnemies, spawnTime, enemyPosX, enemyPosY, enemyNextX, enemyNextY){
-	var w = {
-		id: id,
-		amountEnemies:amountEnemies,
-		spawnTime:spawnTime,
-		lastCreatedDate: 0,
-		active: false,
-		keepCreating: true,
-	}
-	
-	w.enemies = [];
-	w.enemyForStats;
-	
-	w.generateEnemies = function(){
-		//para hacer variar a los monstruos un poco hasta que realice objetos mejor hechos.
-		var spd = Math.floor((Math.random() * 2) + 1);
-		var colors = ["blue", "#5B00B5", "#009999", "black"];
-		var colorSelected = Math.floor((Math.random() * colors.length));
-		var health = Math.floor((Math.random() * 15) + 5);
-		var gold = health * 2;
-		var damage = 1;
-		
-		w.enemyForStats = enemy(-500, -500, 0, 0, spd, colors[colorSelected], health, gold, damage);
-		//este enemigo suelto es para mostrarlo en la barra de stats.
-		
-		for ( var i = 0; i < w.amountEnemies ; i++){
-		w.enemies.push(enemy(enemyPosX, enemyPosY - i * 40, enemyNextX, enemyNextY, spd, colors[colorSelected], health, gold, damage));
-		}
-		
-	}
-	
-	w.setActiveInactive = function(){
-		w.active = !w.active;
-	}
-	
-	w.keepStopCreating = function(){
-	w.keepCreating = !w.keepCreating;
-	}
-	
-	return w;
-}
-
-var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
-	var ent = {
-	id:"enemy",
-	posX: posX,
-	posY: posY,
-	nextX: nextX,
-	nextY: nextY,
-	spd: spd,
-	width:20,
-	height:20,
-	color: color,
-	movement: 0,
-	direction : "horizontal",
-	health: health,
-	gold: gold,
-	damage: damage,
-	
-	};
-	
-	ent.reduceHealthByHit = function(damage){
-		ent.health-=damage;
-	}
-	
-	return ent;
-};
-
-var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price){
-	var t = {
-	id: id,
-	type:type,
-	width:20,
-	height:20,
-	range: range,
-	color: color,
-	posX: posX,
-	posY: posY,
-	bulletSpeed: bulletSpeed,
-	bulletDamage: bulletDamage,
-	atkSpeed: atkSpeed, //milisec entre disparo y disparo
-	price: price,
-	lastAttack: (new Date()).getTime(),
-	};
-	
-	t.myBullets = [];
-	
-	t.fixCenter = function(){
-		//por algun motivo no se toma bien el centro de la torre con el click del mouse, asi que lo corrijo.
-		t.posX = posX - t.width/2;
-		t.posY = posY - t.height/2;
-	}
-
-	t.drawEntity = function() { //redefino la funcion para dibujar el area de alcance
-		drawEntity(t);
-		ctx.beginPath();
-		ctx.arc(t.posX,t.posY,t.range,0,2*Math.PI);
-		ctx.stroke();
-	}
-	
-	t.detectEnemy = function(enemy)
-	{
-		if (Math.pow(enemy.posX - t.posX, 2) + Math.pow(enemy.posY - t.posY, 2) <= Math.pow(t.range,2))
-		{
-			return true;
-		}
-	}
-	
-	t.shootBullet = function(enemy){
-		t.myBullets.push(bullet(t.posX,t.posY, t.bulletSpeed, t.bulletDamage ,enemy));
-	}
-	
-	t.checkTowerOverlap = function(){
-	var possible = false;
-	
-	if(towers.length == 0) //si es la 1ra torre no reviso nada
-		possible = true;
-	else
-	{
-		for (var key in towers){
-			if ( Math.abs(t.posX - towers[key].posX) > towers[key].width ||
-				 Math.abs(t.posY - towers[key].posY) > towers[key].height)
-				 {
-				 possible = true; 
-				 }	 
-				 //Al intentar poner una torre se va a comparar que no se superponga.
-				 //Se comparan las coordenadas x y con las posiciones de todas las torres, si ninguna se superpone con x e y
-				 //posible se convierte en true y se va a poner la torre, sino va a ser false.
-			else
-			{
-				possible = false;
-				break; //si encuentro al menos 1 torre tengo que poner la variable en falso y salir, ya que si una torre da false en el 
-					//listado, pero la que sigue da true, todavia seria un error.
-			}
-		}
-	}
-	
-	return possible; 
-	}
-	
-	t.checkRoadOverlap = function(arrayX, arrayY,roadWidth){
-		var possible = true;
-		var X1, X2, Y1, Y2;
-		
-		for (var i = 0; i < arrayX.length - 1; i++){
-		X1 = arrayX[i] - t.width;
-		X2 = arrayX[i+1] + t.width;
-		Y1 = arrayY[i] - t.height; 
-		Y2 = arrayY[i+1] + t.height;
-		
-		if (Y2 < Y1){ // Si el dibujado se de arriba hacia abajo me jode los calculos, por eso tengo que cambiar los nodos, para que se calcule del 
-						//nodo mas arriba en la pantalla al mas abajo de la pantalla (o el de mas a la dcha con el mas a la izq)
-			var aux = Y2 - 2 * t.height;
-			Y2 = Y1 + 2 * t.height;
-			Y1 = aux;
-			}
-		if (X2 < X1){
-			var aux = X2 - 2 * t.width;
-			X2 = X1 + 2 * t.width;
-			X1 = aux;
-			}
-			if(t.posY > Y1 && t.posY < Y2 && t.posX >  X1 && t.posX < X2 ){
-				
-				possible = false;
-				return possible;
-				}
-	
-			}
-		return possible;
-	}
-	
-	t.checkOutOfBoundaries = function(){
-		var possible = true;
-		if (t.posX > C_WIDTH - t.width/2 || t.posX < 0 + t.width/2 || t.posY > C_HEIGHT - t.height/2 || t.posY < 0 + t.height/2)
-			possible = false;
-		return possible;
-	}
-	
-	return t;
-}
-
-var ghostTower = function(posX,posY){
-	var gt = tower(posX,posY);
-	gt.id = "ghostTower";
-	gt.color = "grey";
-	
-	gt.updatePos = function(x,y){
-		gt.posX = x;
-		gt.posY = y;
-	}
-	
-	gt.range; 
-	
-	gt.setRange = function(range){
-		gt.range = range;
-	}
-	
-	return gt;
-}
-
-var bullet = function(posX, posY, spd, dmg, enemy){
-	var b = {
-	id: "bullet",
-	posX: posX,
-	posY: posY,
-	height: 4,
-	width: 4,
-	spd: spd,
-	dmg: dmg, 
-	color: "yellow",
-	target: enemy,
-	}
-	
-	
-	
-	b.persuitEnemy = function()
-	{
-		if (b.target.posX < b.posX) b.posX -= spd;
-		else b.posX += spd;
-		if (b.target.posY < b.posY) b.posY -= spd;
-		else b.posY += spd;
-	}
-	
-	b.drawEntity = function(){
-		drawEntity(b);
-	}
-	
-	b.collideWithEnemy = function(){
-		if ( Math.abs(b.posX - b.target.posX) < b.target.width &&
-			 Math.abs(b.posY - b.target.posY) < b.target.height)
-				 {
-					b.target.reduceHealthByHit(b.dmg);
-					return true;
-				 }	 
-	}
-	
-	return b;
-}
-
-
-var genMap = function(){
-	var obj = {
-		x : [75 , 75 , 450, 450 , 225 , 225  , 310, 310, 375, 375, 600],
-		y : [-20, 400, 400, 150 , 150, 300 , 300, 100, 100, 450, 450],
-		roadWidth: 10,
-		color: "#B26B24",
-		};
-	return obj;
-};
-
 map1 = genMap();
 waves = []; 
 enemies = [];
 towers = [];
-gTower = ghostTower(-50,-50); //posx, posy, range
+gTower = ghostTower(-50,-50); //posx, posy
 player = player();
 
 window.addEventListener('focus',setInterval(update,fps)); //update solo se debe ejecutar si la tab esta visible
 
-
-//-+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+---//
-//----------------------------Funciones--------------------------------------------Funciones----------------//
-//-+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+---//
-
-
-document.onclick = function(event){
-    var x = event.clientX;
-    var y = event.clientY;
-	
-	if (player.optionTowerSelected != "0"){ 
-		switch(player.optionTowerSelected){
-			case "1":
-				//id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price
-				var newTower = tower(player.optionTowerSelected, "archer",  x, y, 100, "red", 4, 2 , 200, 250);
-				break;
-			case "2":
-				var newTower = tower(player.optionTowerSelected, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
-				break;
-		}
-			newTower.fixCenter();
-		
-		if(newTower.checkTowerOverlap() && newTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth) && player.money >= newTower.price && newTower.checkOutOfBoundaries()
-			&& newTower.type != "0") //chequeo si la nueva torre se superpone con una existente
-		{
-			towers.push(newTower); //Creo una torre con un click y la pongo en el array de torres
-			player.buyingTower(newTower.price);
-		}
-		else
-		{
-			delete newTower;
-		}
-	}
-	else{
-		//seleccionar la torre para update, borrar, etc...
-	}
-	
-	if (x> 10 && x <60 && y > 455 && y < 505)
-	{//si hago click en el boton Play de abajo.
-	
-		/*if (waves[currentActiveWave] != undefined && waves[currentActiveWave].length == 0)
-		{
-		currentActiveWave++;
-		console.log("current = " + currentActiveWave);
-		}*/
-		
-		
-		if(waves[currentActiveWave] == undefined){
-		var amountEnemies = Math.floor((Math.random() * 5) + 10);
-		waves.push(wave( (currentActiveWave + 1) , amountEnemies, 500, map1.x[0], map1.y[0], map1.x[1], map1.y[1]));
-		waves[currentActiveWave].setActiveInactive();
-		}
-	}
-}
-
-document.onmousemove = function(event){
-        var mouseX = event.clientX - document.getElementById('ctx').getBoundingClientRect().left;
-        var mouseY = event.clientY - document.getElementById('ctx').getBoundingClientRect().top;
-		
-		gTower.updatePos(mouseX-2,mouseY-2); //hay un defase por alguna razon (capaz el borde del canvas) entre la sombra que 
-											//se muestra y la torre que se coloca. tuve que sacarle 2 px
-}
-
-document.onkeydown = function(event){
-	
-	switch (event.keyCode){
-		case 49:
-			player.setOptionTowerSelected("1");
-			break;
-		case 50:
-			player.setOptionTowerSelected("2");
-			break;
-	}
-}
-
-document.onkeyup = function (event){
-	player.setOptionTowerSelected("0"); //si no estoy aprentando ninguna tecla seguro deselecciono el boton
-}
 
 function update(){
 	stats.clearRect(0,0,200,500);
@@ -409,12 +66,17 @@ function update(){
 
 	if (waves[currentActiveWave] != undefined && waves[currentActiveWave].active){
 	
+		for (var key in towers)
+		{
+			towers[key].setUsed();
+		}
+	
 		if ( (globalTimer - waves[currentActiveWave].lastCreatedDate) > waves[currentActiveWave].spawnTime &&
 		waves[currentActiveWave].amountEnemies > waves[currentActiveWave].enemies.length && waves[currentActiveWave].keepCreating)
 		{
-		//console.log("enemigos en la oleada " + currentActiveWave + " = " + waves[currentActiveWave].enemies.length + " - " + waves[currentActiveWave].lastCreatedDate);
-		//console.log("Global = " + globalTimer + " -  lastCreted =  " + waves[currentActiveWave].lastCreatedDate + " = " + (globalTimer - waves[currentActiveWave].lastCreatedDate) );
+		
 		waves[currentActiveWave].generateEnemies();
+		
 		waves[currentActiveWave].lastCreatedDate = globalTimer;
 		if ( waves[currentActiveWave].amountEnemies == waves[currentActiveWave].enemies.length){
 			waves[currentActiveWave].keepStopCreating(); 
@@ -534,97 +196,6 @@ function update(){
 }
 
 
-drawEntity = function(entity){
-        ctx.save();
-        ctx.fillStyle = entity.color;
-        ctx.fillRect(entity.posX - entity.width/2,entity.posY - entity.height/2,entity.width,entity.height);	
-        ctx.restore();
-}
-
-drawMap = function(map){
-
-		ctx.fillStyle = map.color;
-		var drawLine;
-		for ( var i = 0; i < map.x.length ; i++){
-		
-		if ( typeof map.x[i+1] !== "undefined" && map.x[i+1] == map.x[i]){
-		drawLine = map.y[i+1] - map.y[i];
-		ctx.fillRect(map.x[i] - map.roadWidth/2,map.y[i] - map.roadWidth/2,map.roadWidth,drawLine);
-		}
-		
-		if ( typeof map.y[i+1] !== "undefined" && map.y[i+1] == map.y[i]){
-		drawLine = map.x[i+1] - map.x[i];
-		ctx.fillRect(map.x[i] - map.roadWidth/2,map.y[i] - map.roadWidth/2,drawLine+map.roadWidth,map.roadWidth);
-		}
-		
-		ctx.fillStyle = "black"; //los puntitos en cada esquina
-		ctx.fillRect(map.x[i]-1,map.y[i]-1, 3, 3);
-		ctx.fillStyle = map.color;
-		}
-		
-}
-
-drawStats = function(money, lives){
-	stats.save();
-	stats.fillStyle = "white";
-	stats.font = "20px Georgia"
-	stats.fillText("Lives: " + lives, 20, 30);
-	stats.fillText("Money: " + money, 20, 50);
-	if ( waves[currentActiveWave] != undefined && waves[currentActiveWave].enemyForStats != undefined)
-	{
-	stats.fillText("Wave: " + waves[currentActiveWave].id, 20, 70);
-	stats.fillText("Current Enemy:", 20, 100);
-	stats.fillText("Health: " + waves[currentActiveWave].enemyForStats.health , 20, 120);
-	stats.fillText("Speed: " + waves[currentActiveWave].enemyForStats.spd , 20, 140);
-	stats.fillText("Gold: " + waves[currentActiveWave].enemyForStats.gold , 20, 160);
-	stats.fillText("Damage: " + waves[currentActiveWave].enemyForStats.damage , 20, 180);
-	}
-	else
-	{
-	stats.fillText("Wave: " + (currentActiveWave + 1), 20, 70);
-	}	
-	
-	stats.fillStyle = "red";
-	if (player.optionTowerSelected == "1"){
-		stats.fillRect(20,300,40,40);
-	}
-	else if(player.optionTowerSelected == "2"){
-		stats.fillRect(20,360,40,40);
-	}
-	
-	stats.strokeStyle = "white";
-	stats.fillStyle = "white";
-	stats.strokeRect(20,300,40,40);
-	stats.font = "30px Georgia"
-	stats.fillText("1", 33, 326);
-	if (money < 250)
-		stats.fillStyle = "red";
-	stats.font = "20px Georgia";
-	stats.fillText("250 gold", 73, 326);
-	
-	stats.fillStyle = "white";
-	stats.strokeRect(20,360,40,40);
-	stats.font = "30px Georgia"
-	stats.fillText("2", 32, 387);
-	if (money < 600)
-		stats.fillStyle = "red";
-	stats.font = "20px Georgia";
-	stats.fillText("600 gold", 73, 387);
-	
-	
-	
-	stats.restore();
-
-}
-
-drawPlayButton = function(){
-	ctx.save();
-	ctx.strokeStyle = "black";
-	ctx.fillStyle = "white";
-	ctx.strokeRect(5,450,45,45);
-	ctx.fillRect(5,450,45,45);
-	ctx.restore();
-}
 		/*
 		function writeMessage(canvas, message) {
         var context = canvas.getContext('2d');
