@@ -14,16 +14,35 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	price: price,
 	lastAttack: (new Date()).getTime(),
 	used: false,
+	imSelected: false,
+	inUse: false, 
 	};
 	
 	t.myBullets = [];
+	
+	t.leftSidePos = t.posX - t.width / 2; //la coord X del lado izq
+	t.rightSidePos = t.posX + t.width / 2; 
+	t.topSidePos = t.posY - t.height / 2;
+	t.bottomSidePos = t.posY + t.height / 2;
+	
+	t.usingNotUsing = function(){
+		t.inUse = !t.inUse;
+	}
+	
+	t.clickedOnMe = function(mouseX, mouseY){
+		//console.log ( "left = " + t.leftSidePos + "   MouseX = " + mouseX + "  right = " + t.rightSidePos + 
+		// "  top = " + t.topSidePos + "   MouseY = " + mouseY + "  bottom = " + t.bottomSidePos);
+		if ( mouseX >= t.leftSidePos && mouseX <= t.rightSidePos && 
+			mouseY >= t.topSidePos && mouseY <= t.bottomSidePos)
+			return true;
+	}
 	
 	t.fixCenter = function(){
 		//por algun motivo no se toma bien el centro de la torre con el click del mouse, asi que lo corrijo.
 		t.posX = posX - t.width/2;
 		t.posY = posY - t.height/2;
 	}
-
+	
 	t.drawEntity = function() { //redefino la funcion para dibujar el area de alcance
 		drawEntity(t);
 		ctx.beginPath();

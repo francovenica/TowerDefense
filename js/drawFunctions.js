@@ -8,10 +8,10 @@ drawEntity = function(entity){
 
 drawMap = function(map){
 
-		ctx.fillStyle = map.color;
-		var drawLine;
-		for ( var i = 0; i < map.x.length ; i++){
-		
+	ctx.fillStyle = map.color;
+	var drawLine;
+	for ( var i = 0; i < map.x.length ; i++){
+	
 		if ( typeof map.x[i+1] !== "undefined" && map.x[i+1] == map.x[i]){
 		drawLine = map.y[i+1] - map.y[i];
 		ctx.fillRect(map.x[i] - map.roadWidth/2,map.y[i] - map.roadWidth/2,map.roadWidth,drawLine);
@@ -25,7 +25,7 @@ drawMap = function(map){
 		ctx.fillStyle = "black"; //los puntitos en cada esquina
 		ctx.fillRect(map.x[i]-1,map.y[i]-1, 3, 3);
 		ctx.fillStyle = map.color;
-		}
+	}
 		
 }
 
@@ -35,6 +35,7 @@ drawStats = function(money, lives){
 	stats.font = "20px Georgia"
 	stats.fillText("Lives: " + lives, 20, 30);
 	stats.fillText("Money: " + money, 20, 50);
+	
 	if ( waves[currentActiveWave] != undefined && waves[currentActiveWave].enemyForStats != undefined)
 	{
 	stats.fillText("Wave: " + waves[currentActiveWave].id, 20, 70);
@@ -48,6 +49,15 @@ drawStats = function(money, lives){
 	{
 	stats.fillText("Wave: " + (currentActiveWave + 1), 20, 70);
 	}	
+	
+	
+	if ( selectedTower != undefined){
+		stats.fillText("Selected Tower: ", 20, 210);
+		stats.fillText("Power: " + selectedTower.bulletDamage, 20, 230);
+		stats.fillText("AtkSpeed: " + 1000/selectedTower.atkSpeed + "/sec", 20, 250);
+		stats.fillText("Range: " + selectedTower.range , 20, 270);
+		stats.fillText("Id: " + selectedTower.id , 20, 290);
+	}
 	
 	stats.fillStyle = "red";
 	if (player.optionTowerSelected == "1"){

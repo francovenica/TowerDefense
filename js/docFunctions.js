@@ -1,15 +1,30 @@
 document.onclick = function(event){
     var x = event.clientX;
     var y = event.clientY;
+	var wasTowerSelected = false;
+	
+	for (var key in towers){ 
+		if (towers[key].clickedOnMe(x,y))
+		{
+			wasTowerSelected = true;
+			towers[key].imSelected = true;
+			selectedTower = towers[key];
+		}
+	}
+	
+	if(!wasTowerSelected && selectedTower != undefined){
+		selectedTower.imSelected = false;
+		selectedTower = undefined;
+		}
 	
 	if (player.optionTowerSelected != "0"){ 
 		switch(player.optionTowerSelected){
 			case "1":
 				//id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price
-				var newTower = tower(player.optionTowerSelected, "archer",  x, y, 100, "red", 4, 2 , 200, 250);
+				var newTower = tower(towers.length, "archer",  x, y, 100, "red", 4, 2 , 200, 250);
 				break;
 			case "2":
-				var newTower = tower(player.optionTowerSelected, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
+				var newTower = tower(towers.length, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
 				break;
 		}
 			newTower.fixCenter();
@@ -38,6 +53,8 @@ document.onclick = function(event){
 		waves[currentActiveWave].setActiveInactive();
 		}
 	}
+	
+	
 }
 
 document.onmousemove = function(event){
@@ -51,11 +68,21 @@ document.onmousemove = function(event){
 document.onkeydown = function(event){
 	
 	switch (event.keyCode){
-		case 49:
+		case 49: // tecla "1"
 			player.setOptionTowerSelected("1");
 			break;
-		case 50:
+		case 50: // tecla "2"
 			player.setOptionTowerSelected("2");
+			break;
+		case 88: // tecla "x"
+			if (selectedTower != undefined && towers[selectedTower.id].inUse == false && towers.splice(selectedTower.id,1) != [])
+			{
+				if ( selectedTower.used )
+					player.sellingTower(selectedTower.price * .75); //si ya se uso la torre, esta vale solo 3/4 partes de su valor
+				else
+					player.sellingTower(selectedTower.price);
+				selectedTower = undefined;
+			}
 			break;
 	}
 }
