@@ -18,10 +18,11 @@ canvas{
 </head>
 <body>
 
-<canvas id="ctx" width="500" height="500""></canvas>
-<canvas id="stats" width="200" height="500""></canvas>
+<canvas id="ctx" width="500" height="500"></canvas>
+<canvas id="stats" width="200" height="500"></canvas>
  
 <script>
+
 var ctx = document.getElementById("ctx").getContext("2d");
 var stats = document.getElementById("stats").getContext("2d");
 var currentActiveWave = 0;
@@ -58,6 +59,7 @@ window.addEventListener('focus',setInterval(update,fps)); //update solo se debe 
 function update(){
 	stats.clearRect(0,0,200,500);
 	drawStats(player.money, player.lives);
+	drawTowerOptions(player.money);
 	
 	ctx.clearRect(0,0,500,500);
 	
@@ -140,7 +142,7 @@ function update(){
 				}
 
 			if(waves[currentActiveWave].enemies.length > 0 && waves[currentActiveWave].enemies[key].health <= 0){
-					player.gettingMoneyFromEnemy(waves[currentActiveWave].enemies[key].gold);
+					player.addingMoney(waves[currentActiveWave].enemies[key].gold);
 					waves[currentActiveWave].enemies.splice(key,1); //la funcion que borra el elemento tiene que estar a lo ultimo del for()
 				}
 		} //end for()

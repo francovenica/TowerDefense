@@ -7,13 +7,12 @@ document.onclick = function(event){
 		if (towers[key].clickedOnMe(x,y))
 		{
 			wasTowerSelected = true;
-			towers[key].imSelected = true;
 			selectedTower = towers[key];
 		}
 	}
 	
 	if(!wasTowerSelected && selectedTower != undefined){
-		selectedTower.imSelected = false;
+		//este if des selecciona la torre si se clickea en el mapa
 		selectedTower = undefined;
 		}
 	
@@ -33,15 +32,12 @@ document.onclick = function(event){
 			&& newTower.type != "0") //chequeo si la nueva torre se superpone con una existente
 		{
 			towers.push(newTower); //Creo una torre con un click y la pongo en el array de torres
-			player.buyingTower(newTower.price);
+			player.subtractingMoney(newTower.worth); //resto oro del jugador por comprar la torre
 		}
 		else
 		{
-			delete newTower;
+			delete newTower; //si posicionar la torre falla la borro
 		}
-	}
-	else{
-		//seleccionar la torre para update, borrar, etc...
 	}
 	
 	if (x> 10 && x <60 && y > 455 && y < 505)
@@ -53,8 +49,6 @@ document.onclick = function(event){
 		waves[currentActiveWave].setActiveInactive();
 		}
 	}
-	
-	
 }
 
 document.onmousemove = function(event){
@@ -66,7 +60,6 @@ document.onmousemove = function(event){
 }
 
 document.onkeydown = function(event){
-	
 	switch (event.keyCode){
 		case 49: // tecla "1"
 			player.setOptionTowerSelected("1");
@@ -75,14 +68,27 @@ document.onkeydown = function(event){
 			player.setOptionTowerSelected("2");
 			break;
 		case 88: // tecla "x"
-			if (selectedTower != undefined && towers[selectedTower.id].inUse == false && towers.splice(selectedTower.id,1) != [])
+			/*var towerIndex = 0;
+			while (towers[towerIndex].id != selectedTower.id){
+				towerIndex++; //Tengo que hacer esto aca porque al ir haciendo splice el indice de la torre se va corriendo y el index no es el mismo que el .id de la torre
+			}*/
+			
+			if (selectedTower != undefined && selectedTower.inUse == false && towers.splice(selectedTower.id,1) != [])
+			{ // si splice da distinto de [] significa que la torre se borro del arreglo towers
+			for ( var key in towers)
 			{
+				towers[key].id = key;
+			}
 				if ( selectedTower.used )
-					player.sellingTower(selectedTower.price * .75); //si ya se uso la torre, esta vale solo 3/4 partes de su valor
+					player.addingMoney(selectedTower.worth * .75); //si ya se uso la torre, esta vale solo 3/4 partes de su valor total (worth)
 				else
-					player.sellingTower(selectedTower.price);
+					player.addingMoney(selectedTower.worth);
 				selectedTower = undefined;
 			}
+			break;
+		case 81: //tecla "q"
+			if (selectedTower != undefined && player.money > (selectedTower.price * 1.2) && selectedTower.upgrade())
+				player.subtractingMoney(selectedTower.price);
 			break;
 	}
 }

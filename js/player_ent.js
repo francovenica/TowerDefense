@@ -5,18 +5,14 @@ var player = function(){
 		optionTowerSelected: "0",
 	};
 	
-	p.buyingTower = function(price){
+	p.subtractingMoney = function(price){
 		p.money -= price;
 	}
 	
-	p.gettingMoneyFromEnemy = function(amount){
+	p.addingMoney = function(amount){
 		p.money += amount;
 	}
-	
-	p.sellingTower = function (amount){
-		p.money += amount;
-	} 
-	
+
 	p.reduceLives = function(damage){
 		p.lives -= damage;
 	}

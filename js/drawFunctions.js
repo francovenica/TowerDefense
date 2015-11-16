@@ -1,3 +1,9 @@
+var statsFontSize = 15;
+var startX = 5;
+var startY = 20;
+var newLine = 15;
+var startWaveStatsY = 60;
+var startTowerStatsY = 150;
 
 drawEntity = function(entity){
         ctx.save();
@@ -29,68 +35,77 @@ drawMap = function(map){
 		
 }
 
-drawStats = function(money, lives){
+drawStats = function(money, lives)
+{
 	stats.save();
 	stats.fillStyle = "white";
-	stats.font = "20px Georgia"
-	stats.fillText("Lives: " + lives, 20, 30);
-	stats.fillText("Money: " + money, 20, 50);
+	stats.font = statsFontSize + "px Georgia"
+	stats.fillText("Lives: " + lives, startX, startY);
+	stats.fillText("Money: " + (money).toFixed(0) , startX, startY + newLine);
 	
 	if ( waves[currentActiveWave] != undefined && waves[currentActiveWave].enemyForStats != undefined)
 	{
-	stats.fillText("Wave: " + waves[currentActiveWave].id, 20, 70);
-	stats.fillText("Current Enemy:", 20, 100);
-	stats.fillText("Health: " + waves[currentActiveWave].enemyForStats.health , 20, 120);
-	stats.fillText("Speed: " + waves[currentActiveWave].enemyForStats.spd , 20, 140);
-	stats.fillText("Gold: " + waves[currentActiveWave].enemyForStats.gold , 20, 160);
-	stats.fillText("Damage: " + waves[currentActiveWave].enemyForStats.damage , 20, 180);
+	stats.fillText("Wave: " + waves[currentActiveWave].id, startX, startWaveStatsY);
+	stats.fillText("Health: " + waves[currentActiveWave].enemyForStats.health , startX, startWaveStatsY + newLine);
+	stats.fillText("Speed: " + waves[currentActiveWave].enemyForStats.spd , startX, startWaveStatsY + newLine * 2);
+	stats.fillText("Gold: " + waves[currentActiveWave].enemyForStats.gold , startX, startWaveStatsY + newLine * 3);
+	stats.fillText("Damage: " + waves[currentActiveWave].enemyForStats.damage , startX, startWaveStatsY + newLine * 4);
 	}
 	else
 	{
-	stats.fillText("Wave: " + (currentActiveWave + 1), 20, 70);
+	stats.fillText("Wave: " + (currentActiveWave + 1), startX, startWaveStatsY);
 	}	
 	
 	
 	if ( selectedTower != undefined){
-		stats.fillText("Selected Tower: ", 20, 210);
-		stats.fillText("Power: " + selectedTower.bulletDamage, 20, 230);
-		stats.fillText("AtkSpeed: " + 1000/selectedTower.atkSpeed + "/sec", 20, 250);
-		stats.fillText("Range: " + selectedTower.range , 20, 270);
-		stats.fillText("Id: " + selectedTower.id , 20, 290);
+		stats.fillText("Selected Tower: ", startX, 150);
+		stats.fillText("Power: " + (selectedTower.bulletDamage).toFixed(0) , startX, startTowerStatsY + newLine);
+		stats.fillText("AtkSpeed: " + (1000/selectedTower.atkSpeed).toFixed(0)  + "/sec", startX, startTowerStatsY + newLine * 2);
+		stats.fillText("Range: " + (selectedTower.range).toFixed(0) , startX, startTowerStatsY + newLine * 3);
+		if ( selectedTower.price * 1.2	 > player.money )
+			stats.fillStyle = "red";
+		stats.fillText("Upgrade: " + (selectedTower.price * 1.2).toFixed(0)  , startX, startTowerStatsY + newLine * 4); //tuve que hacer el 1.2 en el precio porque la 
+																			//torre se crea con el valor y el upgrade ya es un 1.2 mas caro y se mostraba mal
+		stats.fillStyle = "white";
+		if ( selectedTower.used)
+			stats.fillText("Sell For: " + (selectedTower.worth * .75).toFixed(0)  , startX, startTowerStatsY + newLine * 5);
+		else
+			stats.fillText("Sell For: " + (selectedTower.worth).toFixed(0)  , startX, startTowerStatsY + newLine * 5);
 	}
-	
+		stats.restore();
+}
+
+drawTowerOptions = function(money){
+	stats.save();
 	stats.fillStyle = "red";
 	if (player.optionTowerSelected == "1"){
-		stats.fillRect(20,300,40,40);
+		stats.fillRect(startX,300,40,40);
 	}
 	else if(player.optionTowerSelected == "2"){
-		stats.fillRect(20,360,40,40);
+		stats.fillRect(startX,345,40,40);
 	}
 	
 	stats.strokeStyle = "white";
 	stats.fillStyle = "white";
-	stats.strokeRect(20,300,40,40);
+	stats.strokeRect(startX,300,40,40);
 	stats.font = "30px Georgia"
-	stats.fillText("1", 33, 326);
+	stats.fillText("1", startX + 13, 326);
 	if (money < 250)
 		stats.fillStyle = "red";
 	stats.font = "20px Georgia";
-	stats.fillText("250 gold", 73, 326);
+	stats.fillText("250 gold", startX + 45, 326);
 	
 	stats.fillStyle = "white";
-	stats.strokeRect(20,360,40,40);
+	stats.strokeRect(startX,345,40,40);
 	stats.font = "30px Georgia"
-	stats.fillText("2", 32, 387);
+	stats.fillText("2", startX + 12, 372);
 	if (money < 600)
 		stats.fillStyle = "red";
 	stats.font = "20px Georgia";
-	stats.fillText("600 gold", 73, 387);
-	
-	
-	
-	stats.restore();
-
+	stats.fillText("600 gold", startX + 45, 372);
+		stats.restore();
 }
+	
 
 drawPlayButton = function(){
 	ctx.save();
@@ -98,5 +113,14 @@ drawPlayButton = function(){
 	ctx.fillStyle = "white";
 	ctx.strokeRect(5,450,45,45);
 	ctx.fillRect(5,450,45,45);
+	ctx.beginPath();
+	ctx.moveTo(20,460);
+	ctx.lineTo(40,472);
+	ctx.lineTo(20,484);
+	ctx.lineTo(20,460);
+	ctx.strokeStyle="red";
+	ctx.fillStyle="red";
+	ctx.stroke();
+	ctx.fill();
 	ctx.restore();
 }

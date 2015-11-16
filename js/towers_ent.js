@@ -11,11 +11,13 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	bulletSpeed: bulletSpeed,
 	bulletDamage: bulletDamage,
 	atkSpeed: atkSpeed, //milisec entre disparo y disparo
-	price: price,
+	price: price, //precio inicial y precio de upgrade
+	worth: price, //precio total, va a ir sumando cuanta plata se va gastando en upgrades
+	level: 1, //para el nivel de upgrade
 	lastAttack: (new Date()).getTime(),
-	used: false,
-	imSelected: false,
-	inUse: false, 
+	used: false, //sirve para saber si la torre se uso alguna vez (disparo o estuvo en una oleada de monstruos)
+	inUse: false, //Para ver si esta en uso al momento de borrarse (capaz se esta dibujando o se esta comparando algun valor de ella y no quiero que se borre en ese momento)
+	
 	};
 	
 	t.myBullets = [];
@@ -25,13 +27,21 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	t.topSidePos = t.posY - t.height / 2;
 	t.bottomSidePos = t.posY + t.height / 2;
 	
+	t.upgrade = function(){
+		t.range = t.range * 1.10;
+		t.bulletDamage = t.bulletDamage * 1.5;
+		t.atkSpeed = t.atkSpeed * .9;
+		t.price = t.price * 1.20;
+		t.worth += t.price;
+		return true;
+	}
+	
 	t.usingNotUsing = function(){
+		//para evitar borrar una torre que esta siendo dibujada o disparando cuando se la vende
 		t.inUse = !t.inUse;
 	}
 	
 	t.clickedOnMe = function(mouseX, mouseY){
-		//console.log ( "left = " + t.leftSidePos + "   MouseX = " + mouseX + "  right = " + t.rightSidePos + 
-		// "  top = " + t.topSidePos + "   MouseY = " + mouseY + "  bottom = " + t.bottomSidePos);
 		if ( mouseX >= t.leftSidePos && mouseX <= t.rightSidePos && 
 			mouseY >= t.topSidePos && mouseY <= t.bottomSidePos)
 			return true;
