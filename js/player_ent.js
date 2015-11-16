@@ -1,16 +1,16 @@
 var player = function(){
 	var p = {
 		lives: 20,
-		money: 1000,
+		gold: 1000,
 		optionTowerSelected: "0",
 	};
 	
 	p.subtractingMoney = function(price){
-		p.money -= price;
+		p.gold -= price;
 	}
 	
 	p.addingMoney = function(amount){
-		p.money += amount;
+		p.gold += amount;
 	}
 
 	p.reduceLives = function(damage){

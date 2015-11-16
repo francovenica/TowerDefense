@@ -12,6 +12,7 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	bulletDamage: bulletDamage,
 	atkSpeed: atkSpeed, //milisec entre disparo y disparo
 	price: price, //precio inicial y precio de upgrade
+	upgrdePrice: price * 1.2,
 	worth: price, //precio total, va a ir sumando cuanta plata se va gastando en upgrades
 	level: 1, //para el nivel de upgrade
 	lastAttack: (new Date()).getTime(),
@@ -31,9 +32,16 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 		t.range = t.range * 1.10;
 		t.bulletDamage = t.bulletDamage * 1.5;
 		t.atkSpeed = t.atkSpeed * .9;
-		t.price = t.price * 1.20;
-		t.worth += t.price;
+		//t.price = t.price * 1.20;
+		t.worth += t.upgrdePrice;
+		t.level++;
 		return true;
+	}
+	
+	t.updateUpgradePrice = function(){
+		//Tengo que aumentar la plata aca y no en upgrade() directamente porque 1ro tengo que hacer el upgrade y estar seguro que upgradeo, despues restar la plata del jugador
+		//y por ultimo aumentar el precio. Si actualizo el precio 1ro al jugador le voy a restar mas plata de la debida
+		t.upgrdePrice = t.upgrdePrice * 1.20;
 	}
 	
 	t.usingNotUsing = function(){

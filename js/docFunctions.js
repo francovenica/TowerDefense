@@ -28,7 +28,7 @@ document.onclick = function(event){
 		}
 			newTower.fixCenter();
 		
-		if(newTower.checkTowerOverlap() && newTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth) && player.money >= newTower.price && newTower.checkOutOfBoundaries()
+		if(newTower.checkTowerOverlap() && newTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth) && player.gold >= newTower.price && newTower.checkOutOfBoundaries()
 			&& newTower.type != "0") //chequeo si la nueva torre se superpone con una existente
 		{
 			towers.push(newTower); //Creo una torre con un click y la pongo en el array de torres
@@ -87,8 +87,11 @@ document.onkeydown = function(event){
 			}
 			break;
 		case 81: //tecla "q"
-			if (selectedTower != undefined && player.money > (selectedTower.price * 1.2) && selectedTower.upgrade())
-				player.subtractingMoney(selectedTower.price);
+			if (selectedTower != undefined && selectedTower.level < 3 && player.gold > (selectedTower.upgrdePrice) && selectedTower.upgrade())
+			{
+				player.subtractingMoney(selectedTower.upgrdePrice);
+				selectedTower.updateUpgradePrice();
+			}
 			break;
 	}
 }

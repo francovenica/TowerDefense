@@ -21,7 +21,10 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	};
 	
 	e.reduceHealthByHit = function(damage){
-		e.health-=damage;
+		if ( damage > e.health)
+			e.health = 0;
+		else
+			e.health-=damage;
 	}
 	
 	e.updateHealthBarPosition = function(){

@@ -58,8 +58,8 @@ window.addEventListener('focus',setInterval(update,fps)); //update solo se debe 
 
 function update(){
 	stats.clearRect(0,0,200,500);
-	drawStats(player.money, player.lives);
-	drawTowerOptions(player.money);
+	drawStats(player.gold, player.lives);
+	drawTowerOptions(player.gold);
 	
 	ctx.clearRect(0,0,500,500);
 	
@@ -78,13 +78,14 @@ function update(){
 		waves[currentActiveWave].amountEnemies > waves[currentActiveWave].enemies.length && waves[currentActiveWave].keepCreating)
 		{
 		
-		waves[currentActiveWave].generateEnemies();
-		
-		waves[currentActiveWave].lastCreatedDate = globalTimer;
-		if ( waves[currentActiveWave].amountEnemies == waves[currentActiveWave].enemies.length){
-			waves[currentActiveWave].keepStopCreating(); 
-			//keepCreating va a pasar a false una vez que consegui generar todos los bichos y no va a crear mas
-		}
+			waves[currentActiveWave].generateEnemies();
+			
+			waves[currentActiveWave].lastCreatedDate = globalTimer;
+			
+			if ( waves[currentActiveWave].amountEnemies == waves[currentActiveWave].enemies.length){
+				waves[currentActiveWave].keepStopCreating(); 
+				//keepCreating va a pasar a false una vez que consegui generar todos los bichos y no va a crear mas
+			}
 		}
 		for(var key in waves[currentActiveWave].enemies)
 		{
