@@ -26,7 +26,8 @@ document.onclick = function(event){
 				var newTower = tower(towers.length, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
 				break;
 			case "3":
-				var newTower = iceTower(towers.length, "ice", x, y, 100, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
+				var newTower = iceTower(towers.length, "ice", x, y, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
+				
 				break;
 		}
 			newTower.fixCenter();
@@ -35,6 +36,10 @@ document.onclick = function(event){
 			&& newTower.type != "0") //chequeo si la nueva torre se superpone con una existente
 		{
 			towers.push(newTower); //Creo una torre con un click y la pongo en el array de torres
+			if ( newTower.type == "ice"){
+				iceTowers.push(newTower); //guardo las torres de hielo en otro lugar porque tengo que hacer una logica loca para que funcionen bien
+				iceTowers.sort(function(a,b){return a.bulletDamage - b.bulletDamage});
+			}
 			player.subtractingMoney(newTower.worth); //resto oro del jugador por comprar la torre
 		}
 		else
@@ -47,8 +52,8 @@ document.onclick = function(event){
 	{//si hago click en el boton Play de abajo.
 			
 		if(waves[currentActiveWave] == undefined){
-		var amountEnemies = Math.floor((Math.random() * 5) + 10);
-		waves.push(wave( (currentActiveWave + 1) , amountEnemies, 500, map1.x[0], map1.y[0], map1.x[1], map1.y[1]));
+		var amountEnemies = Math.floor((Math.random() * 10) + 10);
+		waves.push(wave( (currentActiveWave + 1) , amountEnemies, 1000, map1.x[0], map1.y[0], map1.x[1], map1.y[1]));
 		waves[currentActiveWave].setActiveInactive();
 		}
 	}
@@ -86,6 +91,8 @@ document.onkeydown = function(event){
 				else
 					player.addingMoney(selectedTower.worth);
 				selectedTower = undefined;
+				
+				iceTowers.sort(function(a,b){return a.bulletDamage - b.bulletDamage}); //si se borro una torre de hielo, tengo que reordenar el arreglo
 			}
 			break;
 		case 81: //tecla "q"
@@ -93,6 +100,7 @@ document.onkeydown = function(event){
 			{
 				player.subtractingMoney(selectedTower.upgradePrice);
 				selectedTower.updateUpgradePrice();
+				iceTowers.sort(function(a,b){return a.bulletDamage - b.bulletDamage}); //si se upgradeo una torre de hielo tengo que reordenar todo
 			}
 			break;
 	}

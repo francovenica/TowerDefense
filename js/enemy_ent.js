@@ -16,9 +16,10 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	health: health,
 	gold: gold,
 	damage: damage,	
-	HealthBarColor: "green",
-	HealthBarX: posX,
-	HealthBarY: posY - 17,
+	healthBarColor: "green",
+	healthBarX: posX,
+	healthBarY: posY - 17,
+	freezed : false,
 	};
 	
 	e.reduceHealthByHit = function(damage){
@@ -30,28 +31,32 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	
 	e.updateHealthBarPosition = function(){
 		var barFix = e.health*2/2
-		e.HealthBarX = e.posX - barFix; //barfix centra la barra
-		e.HealthBarY = e.posY - 17;
+		e.healthBarX = e.posX - barFix; //barfix centra la barra
+		e.healthBarY = e.posY - 17;
 	}
 	
 	e.drawEntity = function() {
 	drawEntity(e);
 	if ( e.health < e.maxHealth/2 )
-		e.HealthBarColor = "red";
+		e.healthBarColor = "red";
 	ctx.save();
-	ctx.fillStyle = e.HealthBarColor;
-	ctx.fillRect(e.HealthBarX, e.HealthBarY, e.health*2 , 5);
+	ctx.fillStyle = e.healthBarColor;
+	ctx.fillRect(e.healthBarX, e.healthBarY, e.health*2 , 5);
 	ctx.strokeStyle = "black";
-	ctx.strokeRect(e.HealthBarX, e.HealthBarY, e.health*2 , 5);
+	ctx.strokeRect(e.healthBarX, e.healthBarY, e.health*2 , 5);
     ctx.restore();
 	}
 	
 	e.slowDownBy = function(amount){
-		e.spd =  amount;
+		e.spd =  e.NormalSpd * amount;
 	}
 	
-	e.NormalSpeed = function(){
+	e.normalSpeed = function(){
 		e.spd = e.NormalSpd;
+	}
+	
+	e.freezeUnfreeze = function(){
+		e.freezed = !e.freezed;
 	}
 	
 	return e;

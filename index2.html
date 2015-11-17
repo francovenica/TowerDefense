@@ -50,6 +50,7 @@ map1 = genMap();
 waves = []; 
 enemies = [];
 towers = [];
+iceTowers = [];
 gTower = ghostTower(-50,-50); //posx, posy
 player = player();
 
@@ -160,37 +161,44 @@ function update(){
 	
 	
 	for ( var key in towers){
-		towers[key].usingNotUsing(); //la pongo "en uso, por si el usuario la quiere borrar dentro de este for, que el sistema no lo deje
+		towers[key].usingNotUsing(); //la pongo en uso, por si el usuario la quiere borrar dentro de este for, que el sistema no lo deje
 		towers[key].drawEntity();
 		
 		if( waves[currentActiveWave] != undefined)
 		{
 			for(var key2 in waves[currentActiveWave].enemies){
-				//waves[currentActiveWave].enemies[key2].NormalSpeed();
+				
 				if(towers[key].detectEnemy(waves[currentActiveWave].enemies[key2]))
 				{
 					if ( towers[key].type != "ice" && new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
-					{
+					{	
 							towers[key].shootBullet(waves[currentActiveWave].enemies[key2]);
 							towers[key].lastAttack = new Date().getTime();
 					}
-					else if (towers[key].type == "ice")
+				}
+				
+				for (var key4 in iceTowers){
+					if(iceTowers[key4].detectEnemy(waves[currentActiveWave].enemies[key2]))
 					{
-						waves[currentActiveWave].enemies[key2].slowDownBy(towers[key].bulletDamage);
+						waves[currentActiveWave].enemies[key2].slowDownBy(iceTowers[key4].bulletDamage);
+						waves[currentActiveWave].enemies[key2].freezeUnfreeze();
+						break;
 					}
+					else
+						waves[currentActiveWave].enemies[key2].normalSpeed();
 				}
 			}
 		}
 		
+		if ( towers[key].type != "ice")
 		for(var key3 in towers[key].myBullets)
 		{
-			
-			towers[key].myBullets[key3].persuitEnemy();
-			towers[key].myBullets[key3].drawEntity();
-			if(towers[key].myBullets[key3].collideWithEnemy())
-				towers[key].myBullets.splice(key3,1);
+				towers[key].myBullets[key3].persuitEnemy();
+				towers[key].myBullets[key3].drawEntity();
+				if(towers[key].myBullets[key3].collideWithEnemy())
+					towers[key].myBullets.splice(key3,1);
 		}
-		towers[key].usingNotUsing(); //la dejo en des uso, la funcion es un switch
+		towers[key].usingNotUsing(); //la dejo en desuso, la funcion es un switch
 	}
 	
 	
@@ -203,7 +211,7 @@ function update(){
 				gTower.setRange(50);
 				break;
 			case "3":
-				gTower.setRange(100);
+				gTower.setRange(35);
 				break;
 		}
 		gTower.drawEntity();
