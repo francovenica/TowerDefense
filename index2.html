@@ -166,12 +166,19 @@ function update(){
 		if( waves[currentActiveWave] != undefined)
 		{
 			for(var key2 in waves[currentActiveWave].enemies){
+				//waves[currentActiveWave].enemies[key2].NormalSpeed();
 				if(towers[key].detectEnemy(waves[currentActiveWave].enemies[key2]))
-				if ( new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
+				{
+					if ( towers[key].type != "ice" && new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
 					{
-						towers[key].shootBullet(waves[currentActiveWave].enemies[key2]);
-						towers[key].lastAttack = new Date().getTime();
-					};	
+							towers[key].shootBullet(waves[currentActiveWave].enemies[key2]);
+							towers[key].lastAttack = new Date().getTime();
+					}
+					else if (towers[key].type == "ice")
+					{
+						waves[currentActiveWave].enemies[key2].slowDownBy(towers[key].bulletDamage);
+					}
+				}
 			}
 		}
 		
@@ -190,10 +197,13 @@ function update(){
 	if ( typeof gTower !== "undefined" && player.optionTowerSelected != "0"){
 		switch (player.optionTowerSelected){
 			case "1":
-				gTower.setRange(100);
+				gTower.setRange(75);
 				break;
 			case "2":
 				gTower.setRange(50);
+				break;
+			case "3":
+				gTower.setRange(100);
 				break;
 		}
 		gTower.drawEntity();

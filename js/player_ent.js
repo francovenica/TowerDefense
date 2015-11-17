@@ -1,7 +1,7 @@
 var player = function(){
 	var p = {
 		lives: 20,
-		gold: 1000,
+		gold: 5800,
 		optionTowerSelected: "0",
 	};
 	

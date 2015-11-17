@@ -20,10 +20,13 @@ document.onclick = function(event){
 		switch(player.optionTowerSelected){
 			case "1":
 				//id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price
-				var newTower = tower(towers.length, "archer",  x, y, 100, "red", 4, 2 , 200, 250);
+				var newTower = tower(towers.length, "archer",  x, y, 75, "red", 4, 2 , 200, 250);
 				break;
 			case "2":
 				var newTower = tower(towers.length, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
+				break;
+			case "3":
+				var newTower = iceTower(towers.length, "ice", x, y, 100, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
 				break;
 		}
 			newTower.fixCenter();
@@ -67,11 +70,10 @@ document.onkeydown = function(event){
 		case 50: // tecla "2"
 			player.setOptionTowerSelected("2");
 			break;
+		case 51: // tecla "3"
+			player.setOptionTowerSelected("3");
+			break;
 		case 88: // tecla "x"
-			/*var towerIndex = 0;
-			while (towers[towerIndex].id != selectedTower.id){
-				towerIndex++; //Tengo que hacer esto aca porque al ir haciendo splice el indice de la torre se va corriendo y el index no es el mismo que el .id de la torre
-			}*/
 			
 			if (selectedTower != undefined && selectedTower.inUse == false && towers.splice(selectedTower.id,1) != [])
 			{ // si splice da distinto de [] significa que la torre se borro del arreglo towers
@@ -87,9 +89,9 @@ document.onkeydown = function(event){
 			}
 			break;
 		case 81: //tecla "q"
-			if (selectedTower != undefined && selectedTower.level < 3 && player.gold > (selectedTower.upgrdePrice) && selectedTower.upgrade())
+			if (selectedTower != undefined && selectedTower.level < 3 && player.gold > (selectedTower.upgradePrice) && selectedTower.upgrade())
 			{
-				player.subtractingMoney(selectedTower.upgrdePrice);
+				player.subtractingMoney(selectedTower.upgradePrice);
 				selectedTower.updateUpgradePrice();
 			}
 			break;

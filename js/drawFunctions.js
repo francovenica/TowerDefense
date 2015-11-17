@@ -64,15 +64,15 @@ drawStats = function(gold, lives)
 		stats.fillText("Range: " + (selectedTower.range).toFixed(2) , startX, startTowerStatsY + newLine * 3);
 		if (selectedTower.level < 3)
 		{
-			if ( selectedTower.upgrdePrice > player.gold)
+			if ( selectedTower.upgradePrice > player.gold)
 			{
 				stats.fillStyle = "red";
-				stats.fillText("Upgrade: " + (selectedTower.upgrdePrice).toFixed(0)  , startX, startTowerStatsY + newLine * 4); 
+				stats.fillText("Upgrade: " + (selectedTower.upgradePrice).toFixed(0)  , startX, startTowerStatsY + newLine * 4); 
 			}
 			else
 			{
 				stats.fillStyle = "white";
-				stats.fillText("Upgrade: " + (selectedTower.upgrdePrice).toFixed(0)  , startX, startTowerStatsY + newLine * 4);
+				stats.fillText("Upgrade: " + (selectedTower.upgradePrice).toFixed(0)  , startX, startTowerStatsY + newLine * 4);
 			}
 		}
 		else
@@ -98,6 +98,9 @@ drawTowerOptions = function(gold){
 	else if(player.optionTowerSelected == "2"){
 		stats.fillRect(startX,345,40,40);
 	}
+	else if(player.optionTowerSelected == "3"){
+		stats.fillRect(startX,390,40,40);
+	}
 	
 	stats.strokeStyle = "white";
 	stats.fillStyle = "white";
@@ -117,6 +120,15 @@ drawTowerOptions = function(gold){
 		stats.fillStyle = "red";
 	stats.font = "20px Georgia";
 	stats.fillText("600 gold", startX + 45, 372);
+	
+	stats.fillStyle = "white";
+	stats.strokeRect(startX,390,40,40);
+	stats.font = "30px Georgia"
+	stats.fillText("3", startX + 12, 416);
+	if (gold < 1000)
+		stats.fillStyle = "red";
+	stats.font = "20px Georgia";
+	stats.fillText("1000 gold", startX + 45, 418);
 		stats.restore();
 }
 	

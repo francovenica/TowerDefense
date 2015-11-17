@@ -12,7 +12,7 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	bulletDamage: bulletDamage,
 	atkSpeed: atkSpeed, //milisec entre disparo y disparo
 	price: price, //precio inicial y precio de upgrade
-	upgrdePrice: price * 1.2,
+	upgradePrice: price * 1.2,
 	worth: price, //precio total, va a ir sumando cuanta plata se va gastando en upgrades
 	level: 1, //para el nivel de upgrade
 	lastAttack: (new Date()).getTime(),
@@ -29,11 +29,15 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	t.bottomSidePos = t.posY + t.height / 2;
 	
 	t.upgrade = function(){
-		t.range = t.range * 1.10;
-		t.bulletDamage = t.bulletDamage * 1.5;
-		t.atkSpeed = t.atkSpeed * .9;
-		//t.price = t.price * 1.20;
-		t.worth += t.upgrdePrice;
+		t.range *= 1.10;
+		/*if ( t.type == "ice")
+			t.bulletDamage -= 0.15;  
+		else
+		{*/
+			t.bulletDamage *= 1.5;	
+		//}
+		t.atkSpeed *= .9;
+		t.worth += t.upgradePrice;
 		t.level++;
 		return true;
 	}
@@ -41,7 +45,7 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	t.updateUpgradePrice = function(){
 		//Tengo que aumentar la plata aca y no en upgrade() directamente porque 1ro tengo que hacer el upgrade y estar seguro que upgradeo, despues restar la plata del jugador
 		//y por ultimo aumentar el precio. Si actualizo el precio 1ro al jugador le voy a restar mas plata de la debida
-		t.upgrdePrice = t.upgrdePrice * 1.20;
+		t.upgradePrice = t.upgradePrice * 1.20;
 	}
 	
 	t.usingNotUsing = function(){
@@ -62,10 +66,21 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	}
 	
 	t.drawEntity = function() { //redefino la funcion para dibujar el area de alcance
-		drawEntity(t);
+		
+		ctx.save();
+		
 		ctx.beginPath();
 		ctx.arc(t.posX,t.posY,t.range,0,2*Math.PI);
+		if (t.type == "ice")
+		{	
+			ctx.globalAlpha = 0.4;
+			ctx.fillStyle = '#66b2ff';
+			ctx.fill();
+			ctx.globalAlpha = 1;
+		}
 		ctx.stroke();
+		ctx.restore();
+		drawEntity(t);
 	}
 	
 	t.detectEnemy = function(enemy)
@@ -151,4 +166,19 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	}
 	
 	return t;
+}
+
+var iceTower = function(id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price)
+{
+	var it = tower(id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price);
+
+	it.upgrade = function(){
+		it.range *= 1.20;
+		it.bulletDamage -= 0.15; //para la torre de hielo el bulletDamage indica cuanto va a relentizar a los enemigos, por eso se resta	
+		it.worth += it.upgradePrice;
+		it.level++;
+		return true;
+	}
+	
+	return it;
 }

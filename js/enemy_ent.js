@@ -5,7 +5,8 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	posY: posY,
 	nextX: nextX,
 	nextY: nextY,
-	spd: spd,
+	spd: spd, 
+	NormalSpd: spd, //Los enemigos pueden reducir su velocidad, por eso guardo la velocidad base para restaurarla despues
 	width:20,
 	height:20,
 	color: color,
@@ -43,6 +44,14 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	ctx.strokeStyle = "black";
 	ctx.strokeRect(e.HealthBarX, e.HealthBarY, e.health*2 , 5);
     ctx.restore();
+	}
+	
+	e.slowDownBy = function(amount){
+		e.spd =  amount;
+	}
+	
+	e.NormalSpeed = function(){
+		e.spd = e.NormalSpd;
 	}
 	
 	return e;
