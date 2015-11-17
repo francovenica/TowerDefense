@@ -50,9 +50,14 @@ map1 = genMap();
 waves = []; 
 enemies = [];
 towers = [];
+towersForStats;
 iceTowers = [];
 gTower = ghostTower(-50,-50); //posx, posy
 player = player();
+
+towersForStats.push(tower(0, "archer",  x, y, 75, "red", 4, 2 , 200, 250));
+towersForStats.push(tower(0, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600));
+towersForStats.push(iceTower(0, "ice", x, y, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000));
 
 window.addEventListener('focus',setInterval(update,fps)); //update solo se debe ejecutar si la tab esta visible
 

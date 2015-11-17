@@ -39,7 +39,7 @@ drawStats = function(gold, lives)
 {
 	stats.save();
 	stats.fillStyle = "white";
-	stats.font = statsFontSize + "px Georgia"
+	stats.font = statsFontSize + "px Times New Roman"
 	stats.fillText("Lives: " + lives, startX, startY);
 	stats.fillText("Gold: " + gold.toFixed(0) , startX, startY + newLine);
 	
@@ -93,43 +93,52 @@ drawTowerOptions = function(gold){
 	stats.save();
 	stats.fillStyle = "red";
 	if (player.optionTowerSelected == "1"){
-		stats.fillRect(startX,300,40,40);
+		stats.fillRect(startX,300,26,26);
+		stats.fillStyle = "white";
+		if (gold < 250)
+			stats.fillStyle = "red";
+		stats.font = "20px Times New Roman";
+		stats.fillText("250 gold", startX, 350);
+		stats.font = "15px Times New Roman";
+		stats.fillText("Archer tower: shoots at", startX, 380);
+		stats.fillText("the enemy closest to the", startX, 395);
+		stats.fillText("exit", startX, 410);
 	}
 	else if(player.optionTowerSelected == "2"){
-		stats.fillRect(startX,345,40,40);
+		stats.fillRect(startX + 30,300,26,26);
+		stats.fillStyle = "white";
+		if (gold < 600)
+			stats.fillStyle = "red";
+		stats.font = "20px Times New Roman";
+		stats.fillText("600 gold", startX, 350);
+		stats.font = "15px Times New Roman";
+		stats.fillText("Cannon tower: shoots at", startX, 380);
+		stats.fillText("the enemy closest to the", startX, 395);
+		stats.fillText("exit", startX, 410);
 	}
 	else if(player.optionTowerSelected == "3"){
-		stats.fillRect(startX,390,40,40);
+		stats.fillRect(startX + 60,300,26,26);
+		stats.fillStyle = "white";
+		if (gold < 1000)
+			stats.fillStyle = "red";
+		stats.font = "20px Times New Roman";
+		stats.fillText("1000 gold", startX, 350);
+		stats.font = "15px Times New Roman";
+		stats.fillText("Ice tower: Slows down the", startX, 380);
+		stats.fillText("enemies in range", startX, 395);
 	}
 	
 	stats.strokeStyle = "white";
 	stats.fillStyle = "white";
-	stats.strokeRect(startX,300,40,40);
-	stats.font = "30px Georgia"
-	stats.fillText("1", startX + 13, 326);
-	if (gold < 250)
-		stats.fillStyle = "red";
-	stats.font = "20px Georgia";
-	stats.fillText("250 gold", startX + 45, 326);
-	
-	stats.fillStyle = "white";
-	stats.strokeRect(startX,345,40,40);
-	stats.font = "30px Georgia"
-	stats.fillText("2", startX + 12, 372);
-	if (gold < 600)
-		stats.fillStyle = "red";
-	stats.font = "20px Georgia";
-	stats.fillText("600 gold", startX + 45, 372);
-	
-	stats.fillStyle = "white";
-	stats.strokeRect(startX,390,40,40);
-	stats.font = "30px Georgia"
-	stats.fillText("3", startX + 12, 416);
-	if (gold < 1000)
-		stats.fillStyle = "red";
-	stats.font = "20px Georgia";
-	stats.fillText("1000 gold", startX + 45, 418);
-		stats.restore();
+	stats.font = "15px Arial"
+	stats.strokeRect(startX,300,26,26);
+	stats.fillText("1", startX + 9, 318);
+	stats.strokeRect(startX + 30,300,26,26);
+	stats.fillText("2", startX + 39, 318);
+	stats.strokeRect(startX + 60,300,26,26);
+	stats.fillText("3", startX + 69, 318);
+
+	stats.restore();
 }
 	
 
