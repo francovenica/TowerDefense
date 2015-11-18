@@ -37,6 +37,7 @@ var selectedTower;
 
 <script src="js/player_ent.js"></script>
 <script src="js/wave_ent.js"></script>
+<script src="js/sprite.js"></script>
 <script src="js/enemy_ent.js"></script>
 <script src="js/towers_ent.js"></script>
 <script src="js/ghostTower_ent.js"></script>
@@ -50,14 +51,24 @@ map1 = genMap();
 waves = []; 
 enemies = [];
 towers = [];
-towersForStats;
+towersForStats = [];
 iceTowers = [];
 gTower = ghostTower(-50,-50); //posx, posy
 player = player();
 
-towersForStats.push(tower(0, "archer",  x, y, 75, "red", 4, 2 , 200, 250));
-towersForStats.push(tower(0, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600));
-towersForStats.push(iceTower(0, "ice", x, y, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000));
+
+var imagen = new Image();
+imagen.src = "img/monster2.png";
+frameIndex = 0;
+tickCount = 0;
+ticksPerFrame = 100;
+numberOfFrames = 4 ;
+sprwidth = 160;
+sprheight = 40;
+
+towersForStats.push(tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250));
+towersForStats.push(tower(0, "cannon", 0, 0, 50, "orange", 4, 10 ,1000, 600));
+towersForStats.push(iceTower(0, "ice", 0, 0, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000));
 
 window.addEventListener('focus',setInterval(update,fps)); //update solo se debe ejecutar si la tab esta visible
 
@@ -69,10 +80,11 @@ function update(){
 	
 	ctx.clearRect(0,0,500,500);
 	
+	
+
 	drawMap(map1);
 	drawPlayButton();
-
-
+	
 	if (waves[currentActiveWave] != undefined && waves[currentActiveWave].active){
 	
 		for (var key in towers)
@@ -95,6 +107,19 @@ function update(){
 		}
 		for(var key in waves[currentActiveWave].enemies)
 		{
+			
+			updImg();
+			ctx.drawImage(imagen, //la imagen
+					frameIndex * sprwidth / numberOfFrames, // Donde tiene que cortar en px a lo ancho [que frame] * frame ancho / numero de frames que hay
+					0, // donde tiene que empezar a cortar a lo alto
+					sprwidth / numberOfFrames, //ancho de la imagen total
+					sprheight, //alto de la imagen total
+					waves[currentActiveWave].enemies[key].posX - 20, //donde lo ubica X
+					waves[currentActiveWave].enemies[key].posY - 10, //donce lo ubica Y
+					sprwidth / numberOfFrames, //cuan ancho va a dibjuar. el ancho de la imagen / numero de frames / 2 para que quede de 20x20
+					sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
+					);
+			
 			if ( waves[currentActiveWave].enemies[key].direction == "horizontal" && 
 			typeof waves[currentActiveWave].enemies[key].nextX !== 'undefined')
 				{
@@ -223,9 +248,27 @@ function update(){
 	}
 	
 	globalTimer = (new Date()).getTime();
+	
+	
 }
 
+updImg = function () {
 
+            tickCount += 1;
+
+            if (tickCount > ticksPerFrame) {
+
+				tickCount = 0;
+				
+                // If the current frame index is in range
+                if (frameIndex < numberOfFrames - 1) {	
+                    // Go to the next frame
+                    frameIndex += 1;
+                } else {
+                    frameIndex = 0;
+                }
+            }
+        };
 		/*
 		function writeMessage(canvas, message) {
         var context = canvas.getContext('2d');

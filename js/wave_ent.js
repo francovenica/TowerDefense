@@ -13,7 +13,8 @@ var wave = function(id, amountEnemies, spawnTime, enemyPosX, enemyPosY, enemyNex
 	
 	w.generateEnemies = function(){
 		//para hacer variar a los monstruos un poco hasta que realice objetos mejor hechos.
-		var spd = Math.floor((Math.random() * 2) + 1);
+		//var spd = Math.floor((Math.random() * 2) + 1);
+		var spd = 1;
 		var colors = ["blue", "#5B00B5", "#009999", "black"];
 		var colorSelected = Math.floor((Math.random() * colors.length));
 		var health = Math.floor((Math.random() * 15) + 5);

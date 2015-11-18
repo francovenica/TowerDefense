@@ -6,10 +6,12 @@ var startWaveStatsY = 60;
 var startTowerStatsY = 150;
 
 drawEntity = function(entity){
-        ctx.save();
+	if(entity.id != "enemy"){
+		ctx.save();
         ctx.fillStyle = entity.color;
         ctx.fillRect(entity.posX - entity.width/2,entity.posY - entity.height/2,entity.width,entity.height);	
-        ctx.restore();
+        ctx.restore();	
+	}
 }
 
 drawMap = function(map){

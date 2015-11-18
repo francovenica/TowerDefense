@@ -3,21 +3,56 @@
 </head>
 <body>
 
+<canvas id="coinAnimation" style="border: 1px solid black"></canvas>
+
 <script>
 
-var a = [1,2,3,4];
-var b;
+var canvas = document.getElementById("coinAnimation");
+canvas.width = 100;
+canvas.height = 100;
 
-for (var key in a)
-{
-	b = a[key];
-	console.log(b);
-	if ( b == 3)
-	continue;
-	debugger;
-	b = 23
+var coinImage = new Image();
+coinImage.src = "img/Monster2.png";	
+
+sprite = function (options) {
+				
+    var that = {};
+					
+    that.context = options.context;
+    that.width = options.width;
+    that.height = options.height;
+    that.image = options.image;
+
+	frameIndex = 0,
+    tickCount = 0,
+    ticksPerFrame = ticksPerFrame || 0;
 	
+	that.render = function () {
+
+        // Draw the animation
+        that.context.drawImage(
+           that.image,
+           0,
+           0,
+           that.width,
+           that.height,
+           0,
+           0,
+           that.width,
+           that.height);
+    };
+	
+    return that;
 }
+
+var coin = sprite({
+    context: canvas.getContext("2d"),
+    width: 40,
+    height: 40,
+    image: coinImage
+});
+
+coin.render();
 </script>
 </body>
 </html>
