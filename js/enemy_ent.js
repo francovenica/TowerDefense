@@ -1,6 +1,7 @@
-var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
+var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	var e = {
 	id:"enemy",
+	type: type,
 	posX: posX,
 	posY: posY,
 	nextX: nextX,
@@ -22,6 +23,31 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	freezed : false,
 	};
 	
+	
+	e.tickCount = 0;
+	e.ticksPerFrame = 10; //mas alto significa menos velocidad de transicion entre frames
+	
+	e.setImageFramesSpritPos = function(){
+		//Cada monstruo puede tener distinto ancho y alto de sprite, asi que necesita un switch para setear dichas medidas
+		switch(e.type){
+			case "knight":
+				e.imagen = new Image();
+				e.imagen.src = "img/monster2.png";
+				e.frameIndex = 0;
+				e.sprwidth = 160;
+				e.sprheight = 40; //quise usar imagen.width o heigth, pero parece que no funciona hasta que no arranca la ejecucion o algo asi
+				break;
+			case "chomp":
+				e.imagen = new Image();
+				e.imagen.src = "img/monster1.png";
+				e.frameIndex = 0;
+				e.sprwidth = 240;
+				e.sprheight = 40; 
+				break;
+		}
+		e.numberOfFrames = e.sprwidth / e.sprheight ;
+	}
+	
 	e.reduceHealthByHit = function(damage){
 		if ( damage > e.health)
 			e.health = 0;
@@ -32,10 +58,11 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	e.updateHealthBarPosition = function(){
 		var barFix = e.health*2/2
 		e.healthBarX = e.posX - barFix; //barfix centra la barra
-		e.healthBarY = e.posY - 17;
+		e.healthBarY = e.posY - 28;
 	}
 	
 	e.drawEntity = function() {
+	
 	drawEntity(e);
 	if ( e.health < e.maxHealth/2 )
 		e.healthBarColor = "red";
@@ -45,6 +72,24 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	ctx.strokeStyle = "black";
 	ctx.strokeRect(e.healthBarX, e.healthBarY, e.health*2 , 5);
     ctx.restore();
+	
+	ctx.fillStyle = "yellow";
+	ctx.fillRect(e.posX, e.posY, 3 , 3);
+	e.drawSprites();
+	}
+	
+	e.drawSprites = function(){
+		e.updImg();
+		ctx.drawImage(e.imagen, //la imagen
+				e.frameIndex * e.sprwidth / e.numberOfFrames, // Donde tiene que cortar en px a lo ancho [que frame] * frame ancho / numero de frames que hay
+				0, // donde tiene que empezar a cortar a lo alto
+				e.sprwidth / e.numberOfFrames, //ancho de la imagen total
+				e.sprheight, //alto de la imagen total
+				e.posX - 20, //donde lo ubica X
+				e.posY - 20, //donce lo ubica Y
+				e.sprwidth / e.numberOfFrames, //cuan ancho va a dibjuar. el ancho de la imagen / numero de frames / 2 para que quede de 20x20
+				e.sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
+				);
 	}
 	
 	e.slowDownBy = function(amount){
@@ -58,6 +103,24 @@ var enemy = function (posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	e.freezeUnfreeze = function(){
 		e.freezed = !e.freezed;
 	}
+	
+	e.updImg = function () {
+            e.tickCount += 1;
+
+            if (e.tickCount > e.ticksPerFrame) {
+
+				e.tickCount = 0;
+				
+                // If the current frame index is in range
+                if (e.frameIndex < e.numberOfFrames - 1) {	
+					
+                    // Go to the next frame
+                    e.frameIndex += 1;
+                } else {
+                    e.frameIndex = 0;
+                }
+            }
+        };
 	
 	return e;
 };

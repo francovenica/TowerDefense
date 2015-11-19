@@ -1,4 +1,5 @@
 document.onclick = function(event){
+	
     var x = event.clientX;
     var y = event.clientY;
 	var wasTowerSelected = false;
@@ -27,7 +28,6 @@ document.onclick = function(event){
 				break;
 			case "3":
 				var newTower = iceTower(towers.length, "ice", x, y, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
-				
 				break;
 		}
 			newTower.fixCenter();
@@ -50,9 +50,11 @@ document.onclick = function(event){
 	
 	if (x> 10 && x <60 && y > 455 && y < 505)
 	{//si hago click en el boton Play de abajo.
-			
-		if(waves[currentActiveWave] == undefined){
+		
+		if(waves[currentActiveWave] == undefined)
+		{
 		var amountEnemies = Math.floor((Math.random() * 10) + 10);
+		
 		waves.push(wave( (currentActiveWave + 1) , amountEnemies, 1000, map1.x[0], map1.y[0], map1.x[1], map1.y[1]));
 		waves[currentActiveWave].setActiveInactive();
 		}

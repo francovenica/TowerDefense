@@ -161,3 +161,5 @@ drawPlayButton = function(){
 	ctx.fill();
 	ctx.restore();
 }
+
+//drawSprites = function(){}

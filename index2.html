@@ -50,13 +50,13 @@ var selectedTower;
 map1 = genMap();
 waves = []; 
 enemies = [];
-towers = {};
-towersForStats = [];
+towers = [];
+towersForStats = {};
 iceTowers = [];
 gTower = ghostTower(-50,-50); //posx, posy
 player = player();
 
-
+/*
 var imagen = new Image();
 imagen.src = "img/monster2.png";
 frameIndex = 0;
@@ -65,14 +65,10 @@ ticksPerFrame = 100;
 numberOfFrames = 4 ;
 sprwidth = 160;
 sprheight = 40;
-
+*/
 
 towerForStatsInit();
 
-/*towersForStats.push(tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250));
-towersForStats.push(tower(0, "cannon", 0, 0, 50, "orange", 4, 10 ,1000, 600));
-towersForStats.push(iceTower(0, "ice", 0, 0, 35, "#3399ff" /*Celeste hielo, 0, .8 ,0, 1000));
-*/
 
 window.addEventListener('focus',setInterval(update,fps)); //update solo se debe ejecutar si la tab esta visible
 
@@ -109,19 +105,7 @@ function update(){
 		}
 		for(var key in waves[currentActiveWave].enemies)
 		{
-			
-			updImg();
-			ctx.drawImage(imagen, //la imagen
-					frameIndex * sprwidth / numberOfFrames, // Donde tiene que cortar en px a lo ancho [que frame] * frame ancho / numero de frames que hay
-					0, // donde tiene que empezar a cortar a lo alto
-					sprwidth / numberOfFrames, //ancho de la imagen total
-					sprheight, //alto de la imagen total
-					waves[currentActiveWave].enemies[key].posX - 20, //donde lo ubica X
-					waves[currentActiveWave].enemies[key].posY - 10, //donce lo ubica Y
-					sprwidth / numberOfFrames, //cuan ancho va a dibjuar. el ancho de la imagen / numero de frames / 2 para que quede de 20x20
-					sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
-					);
-			
+
 			if ( waves[currentActiveWave].enemies[key].direction == "horizontal" && 
 			typeof waves[currentActiveWave].enemies[key].nextX !== 'undefined')
 				{
@@ -179,6 +163,9 @@ function update(){
 					player.addingMoney(waves[currentActiveWave].enemies[key].gold);
 					waves[currentActiveWave].enemies.splice(key,1); //la funcion que borra el elemento tiene que estar a lo ultimo del for()
 				}
+				
+				
+				
 		} //end for()
 		
 		if ( waves[currentActiveWave].enemies.length == 0)
@@ -254,23 +241,24 @@ function update(){
 	
 }
 
+/*
 updImg = function () {
 
-            tickCount += 1;
+	tickCount += 1;
 
-            if (tickCount > ticksPerFrame) {
+	if (tickCount > ticksPerFrame) {
 
-				tickCount = 0;
-				
-                // If the current frame index is in range
-                if (frameIndex < numberOfFrames - 1) {	
-                    // Go to the next frame
-                    frameIndex += 1;
-                } else {
-                    frameIndex = 0;
-                }
-            }
-        };
+		tickCount = 0;
+		
+		// If the current frame index is in range
+		if (frameIndex < numberOfFrames - 1) {	
+			// Go to the next frame
+			frameIndex += 1;
+		} else {
+			frameIndex = 0;
+		}
+	}
+};*/
 		
 function towerForStatsInit(){
 //estas torres se crean solo para poder tener los valores y mostrarlos en otros lugares

@@ -13,6 +13,10 @@ var wave = function(id, amountEnemies, spawnTime, enemyPosX, enemyPosY, enemyNex
 	
 	w.generateEnemies = function(){
 		//para hacer variar a los monstruos un poco hasta que realice objetos mejor hechos.
+		var type = "knight";
+		if(Math.floor((Math.random() * 2) + 1) == 1)
+			type = "chomp";
+		console.log(type);
 		//var spd = Math.floor((Math.random() * 2) + 1);
 		var spd = 1;
 		var colors = ["blue", "#5B00B5", "#009999", "black"];
@@ -25,7 +29,8 @@ var wave = function(id, amountEnemies, spawnTime, enemyPosX, enemyPosY, enemyNex
 		//este enemigo suelto es para mostrarlo en la barra de stats.
 		
 		for ( var i = 0; i < w.amountEnemies ; i++){
-		w.enemies.push(enemy(enemyPosX, enemyPosY - i * 40, enemyNextX, enemyNextY, spd, colors[colorSelected], health, gold, damage));
+		w.enemies.push(enemy(type, enemyPosX, enemyPosY - i * 40, enemyNextX, enemyNextY, spd, colors[colorSelected], health, gold, damage));
+		w.enemies[w.enemies.length-1].setImageFramesSpritPos();
 		}
 		
 	}
