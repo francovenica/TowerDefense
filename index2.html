@@ -27,10 +27,10 @@ var ctx = document.getElementById("ctx").getContext("2d");
 var stats = document.getElementById("stats").getContext("2d");
 var currentActiveWave = 0;
 var globalTimer = (new Date()).getTime();
-var outBoundaries = 525; //el ancho y alto de la pantalla es 500, por eso fuera es un poco mas alla de 500
 var fps = 10;
 var C_HEIGHT = 500;
 var C_WIDTH = 500;
+var outBoundaries = C_WIDTH + 25; //el ancho y alto de la pantalla es 500, por eso fuera es un poco mas alla de 500
 var selectedTower;
 
 </script>
@@ -50,7 +50,7 @@ var selectedTower;
 map1 = genMap();
 waves = []; 
 enemies = [];
-towers = [];
+towers = {};
 towersForStats = [];
 iceTowers = [];
 gTower = ghostTower(-50,-50); //posx, posy
@@ -66,9 +66,13 @@ numberOfFrames = 4 ;
 sprwidth = 160;
 sprheight = 40;
 
-towersForStats.push(tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250));
+
+towerForStatsInit();
+
+/*towersForStats.push(tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250));
 towersForStats.push(tower(0, "cannon", 0, 0, 50, "orange", 4, 10 ,1000, 600));
-towersForStats.push(iceTower(0, "ice", 0, 0, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000));
+towersForStats.push(iceTower(0, "ice", 0, 0, 35, "#3399ff" /*Celeste hielo, 0, .8 ,0, 1000));
+*/
 
 window.addEventListener('focus',setInterval(update,fps)); //update solo se debe ejecutar si la tab esta visible
 
@@ -80,8 +84,6 @@ function update(){
 	
 	ctx.clearRect(0,0,500,500);
 	
-	
-
 	drawMap(map1);
 	drawPlayButton();
 	
@@ -235,13 +237,13 @@ function update(){
 	if ( typeof gTower !== "undefined" && player.optionTowerSelected != "0"){
 		switch (player.optionTowerSelected){
 			case "1":
-				gTower.setRange(75);
+				gTower.setRange(towersForStats.archer.range);
 				break;
 			case "2":
-				gTower.setRange(50);
+				gTower.setRange(towersForStats.cannon.range);
 				break;
 			case "3":
-				gTower.setRange(35);
+				gTower.setRange(towersForStats.iceTower.range);
 				break;
 		}
 		gTower.drawEntity();
@@ -269,6 +271,16 @@ updImg = function () {
                 }
             }
         };
+		
+function towerForStatsInit(){
+//estas torres se crean solo para poder tener los valores y mostrarlos en otros lugares
+	towersForStats = {
+		archer: tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250),
+		cannon: tower(0, "cannon", 0, 0, 50, "orange", 4, 10 ,1000, 600),
+		iceTower: iceTower(0, "ice", 0, 0, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000)
+		}
+}
+
 		/*
 		function writeMessage(canvas, message) {
         var context = canvas.getContext('2d');
