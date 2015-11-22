@@ -32,6 +32,7 @@ var C_HEIGHT = 500;
 var C_WIDTH = 500;
 var outBoundaries = C_WIDTH + 25; //el ancho y alto de la pantalla es 500, por eso fuera es un poco mas alla de 500
 var selectedTower;
+var typesOfMonsters = ["knight", "chomp" , "wizard", "dragon"];
 
 </script>
 
@@ -87,10 +88,10 @@ function update(){
 	
 		for (var key in towers)
 		{
-			towers[key].setUsed();
+			towers[key].setUsed(); //Cuando arranca una oleada seteo todas las torres como "usadas" para que se vendan por el 75% de su valor en vez de 100%
 		}
 	
-		if ( (globalTimer - waves[currentActiveWave].lastCreatedDate) > waves[currentActiveWave].spawnTime &&
+		if ( /*(globalTimer - waves[currentActiveWave].lastCreatedDate) > waves[currentActiveWave].spawnTime &&*/
 		waves[currentActiveWave].amountEnemies > waves[currentActiveWave].enemies.length && waves[currentActiveWave].keepCreating)
 		{
 		
@@ -189,7 +190,7 @@ function update(){
 				
 				if(towers[key].detectEnemy(waves[currentActiveWave].enemies[key2]))
 				{
-					if ( towers[key].type != "ice" && new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
+					if ( towers[key].type != "iceTower" && new Date().getTime() - towers[key].lastAttack > towers[key].atkSpeed)
 					{	
 							towers[key].shootBullet(waves[currentActiveWave].enemies[key2]);
 							towers[key].lastAttack = new Date().getTime();
@@ -209,7 +210,7 @@ function update(){
 			}
 		}
 		
-		if ( towers[key].type != "ice")
+		if ( towers[key].type != "iceTower")
 		for(var key3 in towers[key].myBullets)
 		{
 				towers[key].myBullets[key3].persuitEnemy();
@@ -265,7 +266,7 @@ function towerForStatsInit(){
 	towersForStats = {
 		archer: tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250),
 		cannon: tower(0, "cannon", 0, 0, 50, "orange", 4, 10 ,1000, 600),
-		iceTower: iceTower(0, "ice", 0, 0, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000)
+		iceTower: iceTower(0, "iceTower", 0, 0, 40, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000)
 		}
 }
 

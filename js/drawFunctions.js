@@ -126,7 +126,7 @@ drawTowerOptions = function(gold){
 		stats.font = "20px Times New Roman";
 		stats.fillText("1000 gold", startX, 350);
 		stats.font = "15px Times New Roman";
-		stats.fillText("Ice tower: Slows down the", startX, 380);
+		stats.fillText("Ice Tower: Slows down the", startX, 380);
 		stats.fillText("enemies in range", startX, 395);
 	}
 	

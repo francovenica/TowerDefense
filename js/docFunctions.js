@@ -27,16 +27,18 @@ document.onclick = function(event){
 				var newTower = tower(towers.length, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
 				break;
 			case "3":
-				var newTower = iceTower(towers.length, "ice", x, y, 35, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
+				var newTower = iceTower(towers.length, "iceTower", x, y, 40, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
 				break;
 		}
 			newTower.fixCenter();
-		
+			console.log("x mouse = " + x + " x tower = " + newTower.posX);
+			
 		if(newTower.checkTowerOverlap() && newTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth) && player.gold >= newTower.price && newTower.checkOutOfBoundaries()
 			&& newTower.type != "0") //chequeo si la nueva torre se superpone con una existente
 		{
 			towers.push(newTower); //Creo una torre con un click y la pongo en el array de torres
-			if ( newTower.type == "ice"){
+			newTower.setImageFramesSpritPos();
+			if ( newTower.type == "iceTower"){
 				iceTowers.push(newTower); //guardo las torres de hielo en otro lugar porque tengo que hacer una logica loca para que funcionen bien
 				iceTowers.sort(function(a,b){return a.bulletDamage - b.bulletDamage});
 			}
@@ -65,8 +67,11 @@ document.onmousemove = function(event){
         var mouseX = event.clientX - document.getElementById('ctx').getBoundingClientRect().left;
         var mouseY = event.clientY - document.getElementById('ctx').getBoundingClientRect().top;
 		
-		gTower.updatePos(mouseX-2,mouseY-2); //hay un defase por alguna razon (capaz el borde del canvas) entre la sombra que 
+		if(gTower != undefined)
+			gTower.updatePos(mouseX,mouseY); //hay un defase por alguna razon (capaz el borde del canvas) entre la sombra que 
 											//se muestra y la torre que se coloca. tuve que sacarle 2 px
+		
+		
 }
 
 document.onkeydown = function(event){
@@ -106,8 +111,12 @@ document.onkeydown = function(event){
 			}
 			break;
 	}
+	gTower.setType(player.optionTowerSelected);
+	gTower.setImageFramesSpritPos();
 }
 
 document.onkeyup = function (event){
 	player.setOptionTowerSelected("0"); //si no estoy aprentando ninguna tecla seguro deselecciono el boton
+	gTower.setType(player.optionTowerSelected);
+	gTower.setImageFramesSpritPos();
 }

@@ -23,25 +23,35 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	freezed : false,
 	};
 	
-	
 	e.tickCount = 0;
 	e.ticksPerFrame = 10; //mas alto significa menos velocidad de transicion entre frames
+	e.frameIndex = 0;
 	
 	e.setImageFramesSpritPos = function(){
 		//Cada monstruo puede tener distinto ancho y alto de sprite, asi que necesita un switch para setear dichas medidas
 		switch(e.type){
 			case "knight":
 				e.imagen = new Image();
-				e.imagen.src = "img/monster2.png";
-				e.frameIndex = 0;
+				e.imagen.src = "img/knight.png";
 				e.sprwidth = 160;
 				e.sprheight = 40; //quise usar imagen.width o heigth, pero parece que no funciona hasta que no arranca la ejecucion o algo asi
 				break;
 			case "chomp":
 				e.imagen = new Image();
-				e.imagen.src = "img/monster1.png";
-				e.frameIndex = 0;
+				e.imagen.src = "img/chomp.png";
 				e.sprwidth = 240;
+				e.sprheight = 40; 
+				break;
+			case "wizard":
+				e.imagen = new Image();
+				e.imagen.src = "img/wizard.png";
+				e.sprwidth = 160;
+				e.sprheight = 40; 
+				break;
+			case "dragon":
+				e.imagen = new Image();
+				e.imagen.src = "img/dragon.png";
+				e.sprwidth = 160;
 				e.sprheight = 40; 
 				break;
 		}
@@ -73,8 +83,8 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	ctx.strokeRect(e.healthBarX, e.healthBarY, e.health*2 , 5);
     ctx.restore();
 	
-	ctx.fillStyle = "yellow";
-	ctx.fillRect(e.posX, e.posY, 3 , 3);
+	/*ctx.fillStyle = "yellow"; //dibuja el centro del enemigo con un punto amarillo, para debug nomas
+	ctx.fillRect(e.posX, e.posY, 3 , 3);*/
 	e.drawSprites();
 	}
 	
@@ -91,6 +101,24 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 				e.sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
 				);
 	}
+	
+	e.updImg = function () {
+            e.tickCount += 1;
+
+            if (e.tickCount > e.ticksPerFrame) {
+
+				e.tickCount = 0;
+				
+                // If the current frame index is in range
+                if (e.frameIndex < e.numberOfFrames - 1) {	
+					
+                    // Go to the next frame
+                    e.frameIndex += 1;
+                } else {
+                    e.frameIndex = 0;
+                }
+            }
+        }
 	
 	e.slowDownBy = function(amount){
 		e.spd =  e.NormalSpd * amount;
@@ -120,7 +148,7 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
                     e.frameIndex = 0;
                 }
             }
-        };
+        }
 	
 	return e;
 };

@@ -2,8 +2,8 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	var t = {
 	id: id,
 	type:type,
-	width:20,
-	height:20,
+	width:40,
+	height:40,
 	range: range,
 	color: color,
 	posX: posX,
@@ -11,8 +11,8 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	bulletSpeed: bulletSpeed,
 	bulletDamage: bulletDamage,
 	atkSpeed: atkSpeed, //milisec entre disparo y disparo
-	price: price, //precio inicial y precio de upgrade
-	upgradePrice: price * 1.2,
+	price: price, //precio inicial 
+	upgradePrice: price * 1.2, //precio del upgrade
 	worth: price, //precio total, va a ir sumando cuanta plata se va gastando en upgrades
 	level: 1, //para el nivel de upgrade
 	lastAttack: (new Date()).getTime(),
@@ -28,14 +28,70 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	t.topSidePos = t.posY - t.height / 2;
 	t.bottomSidePos = t.posY + t.height / 2;
 	
+	t.tickCount = 0;
+	t.ticksPerFrame = 10; //mas alto significa menos velocidad de transicion entre frames
+	t.frameIndex = 0;
+	t.imagen = new Image();
+	
+	t.setImageFramesSpritPos = function(){
+		//Cada monstruo puede tener distinto ancho y alto de sprite, asi que necesita un switch para setear dichas medidas
+		switch(t.type){
+			case "iceTower":
+				t.imagen.src = "img/iceTower.png";
+				t.sprwidth = 160;
+				t.sprheight = 40; //quise usar imagen.width o heigth, pero parece que no funciona hasta que no arranca la ejecucion o algo asi
+				break;
+			case "archer":
+				t.imagen.src = "img/iceTower.png";
+				t.sprwidth = 160;
+				t.sprheight = 40; //quise usar imagen.width o heigth, pero parece que no funciona hasta que no arranca la ejecucion o algo asi
+				break;
+			case "cannon":
+				t.imagen.src = "img/iceTower.png";
+				t.sprwidth = 160;
+				t.sprheight = 40; //quise usar imagen.width o heigth, pero parece que no funciona hasta que no arranca la ejecucion o algo asi
+				break;
+		}
+		t.numberOfFrames = t.sprwidth / t.sprheight ;
+	}
+	
+	t.updImg = function () {
+            t.tickCount += 1;
+
+            if (t.tickCount > t.ticksPerFrame) {
+
+				t.tickCount = 0;
+				
+                // If the current frame index is in range
+                if (t.frameIndex < t.numberOfFrames - 1) {	
+					
+                    // Go to the next frame
+                    t.frameIndex += 1;
+                } else {
+                    t.frameIndex = 0;
+                }
+            }
+        };
+	
+	t.drawSprites = function(){
+		t.updImg();
+		ctx.drawImage(t.imagen, //la imagen
+				t.frameIndex * t.sprwidth / t.numberOfFrames, // Donde tiene que cortar en px a lo ancho [que frame] * frame ancho / numero de frames que hay
+				0, // donde tiene que empezar a cortar a lo alto
+				t.sprwidth / t.numberOfFrames, //ancho de la imagen total
+				t.sprheight, //alto de la imagen total
+				t.posX - 19, //donde lo ubica X
+				t.posY - 19 , //donce lo ubica Y
+				t.sprwidth / t.numberOfFrames, //cuan ancho va a dibjuar. el ancho de la imagen / numero de frames / 2 para que quede de 20x20
+				t.sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
+				);
+		console.log(t.imagen.src);
+	}
+	
+	
 	t.upgrade = function(){
 		t.range *= 1.10;
-		/*if ( t.type == "ice")
-			t.bulletDamage -= 0.15;  
-		else
-		{*/
-			t.bulletDamage *= 1.5;	
-		//}
+		t.bulletDamage *= 1.5;
 		t.atkSpeed *= .9;
 		t.worth += t.upgradePrice;
 		t.level++;
@@ -61,8 +117,8 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	
 	t.fixCenter = function(){
 		//por algun motivo no se toma bien el centro de la torre con el click del mouse, asi que lo corrijo.
-		t.posX = posX - t.width/2;
-		t.posY = posY - t.height/2;
+		t.posX = posX - 9;
+		t.posY = posY - 9;
 	}
 	
 	t.drawEntity = function() { //redefino la funcion para dibujar el area de alcance
@@ -71,7 +127,7 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 		
 		ctx.beginPath();
 		ctx.arc(t.posX,t.posY,t.range,0,2*Math.PI);
-		if (t.type == "ice")
+		if (t.type == "iceTower")
 		{	
 			ctx.globalAlpha = 0.4;
 			ctx.fillStyle = '#66b2ff';
@@ -80,7 +136,11 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 		}
 		ctx.stroke();
 		ctx.restore();
-		drawEntity(t);
+		//drawEntity(t);
+		if(t.type != "ghostTower")
+			t.drawSprites();
+		ctx.fillStyle = "yellow"; //dibuja el centro del enemigo con un punto amarillo, para debug nomas
+		ctx.fillRect(t.posX, t.posY, 3 , 3);
 	}
 	
 	t.detectEnemy = function(enemy)
@@ -128,10 +188,10 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 		var X1, X2, Y1, Y2;
 		
 		for (var i = 0; i < arrayX.length - 1; i++){
-		X1 = arrayX[i] - t.width;
-		X2 = arrayX[i+1] + t.width;
-		Y1 = arrayY[i] - t.height; 
-		Y2 = arrayY[i+1] + t.height;
+		X1 = arrayX[i] - t.width/1.5;
+		X2 = arrayX[i+1] + t.width/1.5;
+		Y1 = arrayY[i] - t.height/1.5; 
+		Y2 = arrayY[i+1] + t.height/1.5;
 		
 		if (Y2 < Y1){ // Si el dibujado se de arriba hacia abajo me jode los calculos, por eso tengo que cambiar los nodos, para que se calcule del 
 						//nodo mas arriba en la pantalla al mas abajo de la pantalla (o el de mas a la dcha con el mas a la izq)
@@ -167,6 +227,7 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	
 	return t;
 }
+
 
 var iceTower = function(id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price)
 {
