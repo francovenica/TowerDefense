@@ -14,18 +14,38 @@ canvas{
 	background: #003D99;
 }
 
+div canvas, p{
+	float: left;
+	
+}
+
+div p{
+	width: 50%;
+	margin : 5px;
+	}
+
 </style>
 </head>
 <body>
 
+<div>
 <canvas id="ctx" width="500" height="500"></canvas>
 <canvas id="stats" width="200" height="500"></canvas>
- 
+<p>
+Clickear el boton "play" para empezar una oleada. Solo se puede activar 1 oleada a la vez. La oleada termina cuando todos los monstruos se eliminan o salen del mapa.<br><br>
+Mantener precionado 1, 2 o 3 para elegir una torre y clickear en el mapa para colocarla.
+Si no tenes oro suficiente el valor de la torre se va a mostrar en rojo.
+<br><br>Seleccionar una torre y usar la letra "q" para mejorarla, 2 mejoras maximo.
+<br><br>Seleccionar una torre y usar la letra "x" para venderla. Si la torre se compra y vende sin haber empezado la oleada esta devuelve el 100% del oro,
+Si se coloco la torre y se comenzo una oleada la torre valdra solo el 75% a partir de ese momento</p>
+</div>
+
 <script>
 
 var ctx = document.getElementById("ctx").getContext("2d");
 var stats = document.getElementById("stats").getContext("2d");
 var currentActiveWave = 0;
+var totalWavesPassed = 1;
 var globalTimer = (new Date()).getTime();
 var fps = 10;
 var C_HEIGHT = 500;
@@ -173,8 +193,19 @@ function update(){
 		{
 			waves[currentActiveWave].setActiveInactive();
 			currentActiveWave++;
+			totalWavesPassed++;
 			//Una vez que todos los enemigos son destruidos o cruzan el camino la wave actual se desactiva y se pasa a la siguiente que se
 			//va a activar con un nuevo click
+			if (waves.length >= 2)
+			{	//Si hay mas de 2 oleadas borro la 1ra y dejo la anterior. Se deja la anterior porque en base a los valores de los enemigos (Vida y daño) se va generar la nueva
+				//oleada con valores aumentados. ej:vida de enemigos de esta oleada = vida de enemigos de oleada anterior * 1.2
+				waves.splice(0,1);
+				currentActiveWave--;
+				for ( var index in waves)
+				{	
+					waves[index].id = index;
+				}
+			}
 		}
 		
 	} //end if para wave active
@@ -201,8 +232,8 @@ function update(){
 					if(iceTowers[key4].detectEnemy(waves[currentActiveWave].enemies[key2]))
 					{
 						waves[currentActiveWave].enemies[key2].slowDownBy(iceTowers[key4].bulletDamage);
-						waves[currentActiveWave].enemies[key2].freezeUnfreeze();
-						break;
+						break; //en el momento que reduzco la velocidad a un enemigo tengo que hacer un brake, ya que si sigo buscando puedo llegar a encontrar otra torre de hielo
+								//que no tienen al enemigo en rango y restauraria su velocidad
 					}
 					else
 						waves[currentActiveWave].enemies[key2].normalSpeed();
@@ -211,13 +242,14 @@ function update(){
 		}
 		
 		if ( towers[key].type != "iceTower")
-		for(var key3 in towers[key].myBullets)
-		{
-				towers[key].myBullets[key3].persuitEnemy();
-				towers[key].myBullets[key3].drawEntity();
-				if(towers[key].myBullets[key3].collideWithEnemy())
-					towers[key].myBullets.splice(key3,1);
-		}
+			//si la torre no es de hielo disparon normalmente
+			for(var key3 in towers[key].myBullets)
+			{
+					towers[key].myBullets[key3].persuitEnemy();
+					towers[key].myBullets[key3].drawEntity();
+					if(towers[key].myBullets[key3].collideWithEnemy())
+						towers[key].myBullets.splice(key3,1);
+			}
 		towers[key].usingNotUsing(); //la dejo en desuso, la funcion es un switch
 	}
 	
@@ -241,31 +273,12 @@ function update(){
 	
 	
 }
-
-/*
-updImg = function () {
-
-	tickCount += 1;
-
-	if (tickCount > ticksPerFrame) {
-
-		tickCount = 0;
-		
-		// If the current frame index is in range
-		if (frameIndex < numberOfFrames - 1) {	
-			// Go to the next frame
-			frameIndex += 1;
-		} else {
-			frameIndex = 0;
-		}
-	}
-};*/
-		
+	
 function towerForStatsInit(){
 //estas torres se crean solo para poder tener los valores y mostrarlos en otros lugares
 	towersForStats = {
 		archer: tower(0, "archer",  0, 0, 75, "red", 4, 2 , 200, 250),
-		cannon: tower(0, "cannon", 0, 0, 50, "orange", 4, 10 ,1000, 600),
+		cannon: cannonTower(0, "cannon", 0, 0, 50, "orange", 4, 6 , 40 ,1000, 750),
 		iceTower: iceTower(0, "iceTower", 0, 0, 40, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000)
 		}
 }

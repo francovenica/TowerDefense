@@ -11,7 +11,6 @@ var ghostTower = function(posX,posY){
 		ctx.arc(gt.posX,gt.posY,gt.range,0,2*Math.PI);
 		ctx.stroke();
 		ctx.restore();
-		//drawEntity(gt);
 		if(gt.type != "ghostTower")
 			gt.drawSprites();
 	};

@@ -47,15 +47,15 @@ drawStats = function(gold, lives)
 	
 	if ( waves[currentActiveWave] != undefined && waves[currentActiveWave].enemyForStats != undefined)
 	{
-	stats.fillText("Wave: " + waves[currentActiveWave].id, startX, startWaveStatsY);
-	stats.fillText("Health: " + waves[currentActiveWave].enemyForStats.health , startX, startWaveStatsY + newLine);
-	stats.fillText("Speed: " + waves[currentActiveWave].enemyForStats.spd , startX, startWaveStatsY + newLine * 2);
-	stats.fillText("Gold: " + waves[currentActiveWave].enemyForStats.gold , startX, startWaveStatsY + newLine * 3);
+	stats.fillText("Wave: " + totalWavesPassed, startX, startWaveStatsY);
+	stats.fillText("Health: " + Math.round(waves[currentActiveWave].enemyForStats.health) , startX, startWaveStatsY + newLine);
+	stats.fillText("Speed: " + (waves[currentActiveWave].enemyForStats.spd).toFixed(1) , startX, startWaveStatsY + newLine * 2);
+	stats.fillText("Gold: " + Math.round(waves[currentActiveWave].enemyForStats.gold) , startX, startWaveStatsY + newLine * 3);
 	stats.fillText("Damage: " + waves[currentActiveWave].enemyForStats.damage , startX, startWaveStatsY + newLine * 4);
 	}
 	else
 	{
-	stats.fillText("Wave: " + (currentActiveWave + 1), startX, startWaveStatsY);
+	stats.fillText("Wave: " + totalWavesPassed, startX, startWaveStatsY);
 	}	
 	
 	
@@ -97,11 +97,12 @@ drawTowerOptions = function(gold){
 	if (player.optionTowerSelected == "1"){
 		stats.fillRect(startX,300,26,26);
 		stats.fillStyle = "white";
-		if (gold < 250)
+		if (gold < towersForStats.archer.price)
 			stats.fillStyle = "red";
 		stats.font = "20px Times New Roman";
 		stats.fillText("250 gold", startX, 350);
 		stats.font = "15px Times New Roman";
+		stats.fillStyle = "white";
 		stats.fillText("Archer tower: shoots at", startX, 380);
 		stats.fillText("the enemy closest to the", startX, 395);
 		stats.fillText("exit", startX, 410);
@@ -109,23 +110,26 @@ drawTowerOptions = function(gold){
 	else if(player.optionTowerSelected == "2"){
 		stats.fillRect(startX + 30,300,26,26);
 		stats.fillStyle = "white";
-		if (gold < 600)
+		if (gold < towersForStats.cannon.price)
 			stats.fillStyle = "red";
 		stats.font = "20px Times New Roman";
-		stats.fillText("600 gold", startX, 350);
+		stats.fillText("750 gold", startX, 350);
 		stats.font = "15px Times New Roman";
-		stats.fillText("Cannon tower: shoots at", startX, 380);
-		stats.fillText("the enemy closest to the", startX, 395);
-		stats.fillText("exit", startX, 410);
+		stats.fillStyle = "white";
+		stats.fillText("Cannon tower: It does splash", startX, 380);
+		stats.fillText("damage. It shots to", startX, 395);
+		stats.fillText("the enemy closest to the", startX, 410);
+		stats.fillText("exit", startX, 425);
 	}
 	else if(player.optionTowerSelected == "3"){
 		stats.fillRect(startX + 60,300,26,26);
 		stats.fillStyle = "white";
-		if (gold < 1000)
+		if (gold < towersForStats.iceTower.price)
 			stats.fillStyle = "red";
 		stats.font = "20px Times New Roman";
 		stats.fillText("1000 gold", startX, 350);
 		stats.font = "15px Times New Roman";
+		stats.fillStyle = "white";
 		stats.fillText("Ice Tower: Slows down the", startX, 380);
 		stats.fillText("enemies in range", startX, 395);
 	}

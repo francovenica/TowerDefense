@@ -85,7 +85,6 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 				t.sprwidth / t.numberOfFrames, //cuan ancho va a dibjuar. el ancho de la imagen / numero de frames / 2 para que quede de 20x20
 				t.sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
 				);
-		console.log(t.imagen.src);
 	}
 	
 	
@@ -136,11 +135,10 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 		}
 		ctx.stroke();
 		ctx.restore();
-		//drawEntity(t);
 		if(t.type != "ghostTower")
 			t.drawSprites();
-		ctx.fillStyle = "yellow"; //dibuja el centro del enemigo con un punto amarillo, para debug nomas
-		ctx.fillRect(t.posX, t.posY, 3 , 3);
+		/*ctx.fillStyle = "yellow"; //dibuja el centro del enemigo con un punto amarillo, para debug nomas
+		ctx.fillRect(t.posX, t.posY, 3 , 3);*/
 	}
 	
 	t.detectEnemy = function(enemy)
@@ -152,13 +150,13 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	}
 	
 	t.shootBullet = function(enemy){
-		t.myBullets.push(bullet(t.posX,t.posY, t.bulletSpeed, t.bulletDamage ,enemy));
+		t.myBullets.push(bullet(t.posX,t.posY, t.bulletSpeed, t.bulletDamage , 0, enemy, t.type));
 	}
 	
 	t.checkTowerOverlap = function(){
 	var possible = false;
 	
-	if(towers.length == 0) //si es la 1ra torre no reviso nada
+	if(towers.length == 0) //si es la 1ra torre en el mapa no reviso nada
 		possible = true;
 	else
 	{
@@ -242,4 +240,26 @@ var iceTower = function(id,type, posX,posY,range, color, bulletSpeed, bulletDama
 	}
 	
 	return it;
+}
+
+var cannonTower = function(id,type, posX,posY,range, color, bulletSpeed, bulletDamage, splashRadious, atkSpeed, price){
+	
+	var ct = tower(id,type, posX,posY,range, color, bulletSpeed, bulletDamage, atkSpeed, price);
+	ct.splashRadious = splashRadious;
+	
+	ct.shootBullet = function(enemy){
+		ct.myBullets.push(bullet(ct.posX,ct.posY, ct.bulletSpeed, ct.bulletDamage , ct.splashRadious, enemy, ct.type));
+	}
+	
+	ct.upgrade = function(){
+		ct.range *= 1.10;
+		ct.bulletDamage *= 1.5;
+		ct.atkSpeed *= .9;
+		ct.worth += ct.upgradePrice;
+		ct.splashRadious += 5;
+		ct.level++;
+		return true;
+	}
+	
+	return ct;
 }

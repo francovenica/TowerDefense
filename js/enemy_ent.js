@@ -1,4 +1,4 @@
-var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
+var enemy = function (type,posX,posY,nextX,nextY,spd,health,gold,damage){
 	var e = {
 	id:"enemy",
 	type: type,
@@ -10,7 +10,6 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	NormalSpd: spd, //Los enemigos pueden reducir su velocidad, por eso guardo la velocidad base para restaurarla despues
 	width:20,
 	height:20,
-	color: color,
 	movement: 0,
 	direction : "horizontal",
 	maxHealth: health,
@@ -66,26 +65,18 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	}
 	
 	e.updateHealthBarPosition = function(){
-		var barFix = e.health*2/2
-		e.healthBarX = e.posX - barFix; //barfix centra la barra
+		//var barFix = e.health*2/2
+		e.healthBarX = e.posX - 20;//- barFix; //barfix centra la barra
 		e.healthBarY = e.posY - 28;
 	}
 	
 	e.drawEntity = function() {
 	
-	drawEntity(e);
-	if ( e.health < e.maxHealth/2 )
-		e.healthBarColor = "red";
-	ctx.save();
-	ctx.fillStyle = e.healthBarColor;
-	ctx.fillRect(e.healthBarX, e.healthBarY, e.health*2 , 5);
-	ctx.strokeStyle = "black";
-	ctx.strokeRect(e.healthBarX, e.healthBarY, e.health*2 , 5);
-    ctx.restore();
-	
+	e.drawHealthBar();
+	e.drawSprites();
 	/*ctx.fillStyle = "yellow"; //dibuja el centro del enemigo con un punto amarillo, para debug nomas
 	ctx.fillRect(e.posX, e.posY, 3 , 3);*/
-	e.drawSprites();
+
 	}
 	
 	e.drawSprites = function(){
@@ -100,6 +91,23 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 				e.sprwidth / e.numberOfFrames, //cuan ancho va a dibjuar. el ancho de la imagen / numero de frames / 2 para que quede de 20x20
 				e.sprheight  //cuan alto va a dibjuar. / 2 para que quede de 20x20
 				);
+	}
+	
+	e.drawHealthBar = function()
+	{
+		var fillbar = e.health / e.maxHealth * 40; //hago que la barra se parta en pedacitos para ir reduciendo la vida de a partes a medida que se le pega a los bichos
+		
+		if  ( e.health < e.maxHealth/3 )
+			e.healthBarColor = "red";
+		else if (e.health < e.maxHealth/1.5)
+			e.healthBarColor = "yellow";
+		else;
+		ctx.save();
+		ctx.fillStyle = e.healthBarColor;
+		ctx.fillRect(e.healthBarX, e.healthBarY,  fillbar , 5);
+		ctx.strokeStyle = "black";
+		ctx.strokeRect(e.healthBarX , e.healthBarY, 40 , 5);
+		ctx.restore();
 	}
 	
 	e.updImg = function () {
@@ -126,10 +134,6 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,color,health,gold,damage){
 	
 	e.normalSpeed = function(){
 		e.spd = e.NormalSpd;
-	}
-	
-	e.freezeUnfreeze = function(){
-		e.freezed = !e.freezed;
 	}
 	
 	e.updImg = function () {

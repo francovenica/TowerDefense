@@ -24,14 +24,14 @@ document.onclick = function(event){
 				var newTower = tower(towers.length, "archer",  x, y, 75, "red", 4, 2 , 200, 250);
 				break;
 			case "2":
-				var newTower = tower(towers.length, "cannon", x, y, 50, "orange", 4, 10 ,1000, 600);
+				//id,type, posX,posY,range, color, bulletSpeed, bulletDamage, splashradious, atkSpeed, price
+				var newTower = cannonTower(towers.length, "cannon", x, y, 50, "orange", 4, 6 , 40,1000, 750);
 				break;
 			case "3":
 				var newTower = iceTower(towers.length, "iceTower", x, y, 40, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
 				break;
 		}
 			newTower.fixCenter();
-			console.log("x mouse = " + x + " x tower = " + newTower.posX);
 			
 		if(newTower.checkTowerOverlap() && newTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth) && player.gold >= newTower.price && newTower.checkOutOfBoundaries()
 			&& newTower.type != "0") //chequeo si la nueva torre se superpone con una existente
@@ -86,20 +86,36 @@ document.onkeydown = function(event){
 			player.setOptionTowerSelected("3");
 			break;
 		case 88: // tecla "x"
-			
+			if (selectedTower != undefined )
+			{
+				var towerSold = towers[selectedTower.id]; //guardo la torre
+			}
 			if (selectedTower != undefined && selectedTower.inUse == false && towers.splice(selectedTower.id,1) != [])
 			{ // si splice da distinto de [] significa que la torre se borro del arreglo towers
-			for ( var key in towers)
-			{
-				towers[key].id = key;
-			}
-				if ( selectedTower.used )
-					player.addingMoney(selectedTower.worth * .75); //si ya se uso la torre, esta vale solo 3/4 partes de su valor total (worth)
-				else
-					player.addingMoney(selectedTower.worth);
-				selectedTower = undefined;
-				
-				iceTowers.sort(function(a,b){return a.bulletDamage - b.bulletDamage}); //si se borro una torre de hielo, tengo que reordenar el arreglo
+			
+				if ( towerSold.type == "iceTower")
+				{
+					if (waves[currentActiveWave] != undefined)
+					{
+					//si la torre que borre es de hielo, tengo que descongelar todos los enemigos en rango
+					for (var key in waves[currentActiveWave].enemies){
+						waves[currentActiveWave].enemies[key].normalSpeed();
+					}
+					}
+					iceTowers.splice(iceTowers.indexOf(towerSold),1);
+					console.log(iceTowers);
+				}
+				for ( var key in towers)
+				{  //vuelvo a ajustar el id de las torres que guarda su posicion en el array
+					towers[key].id = key;
+				}
+					if ( selectedTower.used )
+						player.addingMoney(selectedTower.worth * .75); //si ya se uso la torre, esta vale solo 3/4 partes de su valor total (worth)
+					else
+						player.addingMoney(selectedTower.worth);
+					selectedTower = undefined;
+					
+					iceTowers.sort(function(a,b){return a.bulletDamage - b.bulletDamage}); //si se borro una torre de hielo, tengo que reordenar el arreglo
 			}
 			break;
 		case 81: //tecla "q"
