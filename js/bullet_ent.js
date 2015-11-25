@@ -1,4 +1,4 @@
-var bullet = function(posX, posY, spd, dmg, splashRadious, enemy, towerType){
+var bullet = function(posX, posY, spd, dmg, splashRadious, enemy){
 	var b = {
 	id: "bullet",
 	posX: posX,
@@ -9,7 +9,6 @@ var bullet = function(posX, posY, spd, dmg, splashRadious, enemy, towerType){
 	dmg: dmg, 
 	color: "yellow",
 	target: enemy,
-	ownerType: towerType, //si es cannon, va a tener splash damage
 	splashRadious: splashRadious,
 	}
 	
@@ -36,15 +35,24 @@ var bullet = function(posX, posY, spd, dmg, splashRadious, enemy, towerType){
 					}
 					else
 					{
-						for (var key in waves[currentActiveWave].enemies)
-						{
-							if ( b.enemyInSplashRadious(waves[currentActiveWave].enemies[key]) == "near")
+						if ( b.target != undefined)
+						{   //Alguna bala anterior puede matar a un enemigo antes que la bala nueva le pegue, y queda volando. Tengo que chequear que el enemigo exista si quiero seguir
+							//con este for()
+							for (var key in waves[currentActiveWave].enemies)
 							{
-								waves[currentActiveWave].enemies[key].reduceHealthByHit(b.dmg) //si esta cerca del centro de la explocion recibe full damage
-							}
-							else if (b.enemyInSplashRadious(waves[currentActiveWave].enemies[key]) == "far")
-							{
-								waves[currentActiveWave].enemies[key].reduceHealthByHit(b.dmg/2) //si esta lejos del centro recibe solo la mitad del daño
+								switch( b.enemyInSplashRadious(waves[currentActiveWave].enemies[key]))
+								{
+									case "near":
+										waves[currentActiveWave].enemies[key].reduceHealthByHit(b.dmg)
+										break;
+									case "mid": 
+										waves[currentActiveWave].enemies[key].reduceHealthByHit(b.dmg/2);
+										break;
+									case "far": 	
+										waves[currentActiveWave].enemies[key].reduceHealthByHit(b.dmg/3);
+										break;
+								}
+								
 							}
 						}						
 					}
@@ -57,6 +65,10 @@ var bullet = function(posX, posY, spd, dmg, splashRadious, enemy, towerType){
 		if (Math.pow(enemy.posX - b.posX, 2) + Math.pow(enemy.posY - b.posY, 2) <= Math.pow(b.splashRadious/2,2))
 		{
 			return "near";
+		}
+		else if (Math.pow(enemy.posX - b.posX, 2) + Math.pow(enemy.posY - b.posY, 2) <= Math.pow(b.splashRadious/1.5,2))
+		{
+			return "mid";
 		}
 		else if (Math.pow(enemy.posX - b.posX, 2) + Math.pow(enemy.posY - b.posY, 2) <= Math.pow(b.splashRadious,2))
 		{

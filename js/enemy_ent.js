@@ -136,23 +136,5 @@ var enemy = function (type,posX,posY,nextX,nextY,spd,health,gold,damage){
 		e.spd = e.NormalSpd;
 	}
 	
-	e.updImg = function () {
-            e.tickCount += 1;
-
-            if (e.tickCount > e.ticksPerFrame) {
-
-				e.tickCount = 0;
-				
-                // If the current frame index is in range
-                if (e.frameIndex < e.numberOfFrames - 1) {	
-					
-                    // Go to the next frame
-                    e.frameIndex += 1;
-                } else {
-                    e.frameIndex = 0;
-                }
-            }
-        }
-	
 	return e;
 };

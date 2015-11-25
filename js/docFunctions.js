@@ -25,7 +25,7 @@ document.onclick = function(event){
 				break;
 			case "2":
 				//id,type, posX,posY,range, color, bulletSpeed, bulletDamage, splashradious, atkSpeed, price
-				var newTower = cannonTower(towers.length, "cannon", x, y, 50, "orange", 4, 6 , 40,1000, 750);
+				var newTower = cannonTower(towers.length, "cannon", x, y, 50, "orange", 4, 6 , 50,1000, 750);
 				break;
 			case "3":
 				var newTower = iceTower(towers.length, "iceTower", x, y, 40, "#3399ff" /*Celeste hielo*/, 0, .8 ,0, 1000);
@@ -67,9 +67,12 @@ document.onmousemove = function(event){
         var mouseX = event.clientX - document.getElementById('ctx').getBoundingClientRect().left;
         var mouseY = event.clientY - document.getElementById('ctx').getBoundingClientRect().top;
 		
-		if(gTower != undefined)
+		if(gTower != undefined){
 			gTower.updatePos(mouseX,mouseY); //hay un defase por alguna razon (capaz el borde del canvas) entre la sombra que 
 											//se muestra y la torre que se coloca. tuve que sacarle 2 px
+		}
+		
+		
 		
 		
 }
@@ -128,6 +131,7 @@ document.onkeydown = function(event){
 			break;
 	}
 	gTower.setType(player.optionTowerSelected);
+	gTower.setPrice(player.optionTowerSelected)
 	gTower.setImageFramesSpritPos();
 }
 

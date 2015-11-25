@@ -248,7 +248,7 @@ var cannonTower = function(id,type, posX,posY,range, color, bulletSpeed, bulletD
 	ct.splashRadious = splashRadious;
 	
 	ct.shootBullet = function(enemy){
-		ct.myBullets.push(bullet(ct.posX,ct.posY, ct.bulletSpeed, ct.bulletDamage , ct.splashRadious, enemy, ct.type));
+		ct.myBullets.push(bullet(ct.posX,ct.posY, ct.bulletSpeed, ct.bulletDamage , ct.splashRadious, enemy));
 	}
 	
 	ct.upgrade = function(){
@@ -256,10 +256,9 @@ var cannonTower = function(id,type, posX,posY,range, color, bulletSpeed, bulletD
 		ct.bulletDamage *= 1.5;
 		ct.atkSpeed *= .9;
 		ct.worth += ct.upgradePrice;
-		ct.splashRadious += 5;
+		ct.splashRadious += 12.5;
 		ct.level++;
 		return true;
 	}
-	
 	return ct;
 }
