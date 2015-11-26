@@ -28,7 +28,7 @@ var ghostTower = function(posX,posY){
 	gt.setImageFramesSpritPos = function(){
 		//Cada monstruo puede tener distinto ancho y alto de sprite, asi que necesita un switch para setear dichas medidas
 	
-		if (gTower.price > player.gold || !gTower.checkTowerOverlap() || !gTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth))
+		if (gTower.price > player.gold || !gTower.checkTowerOverlap() || !gTower.checkRoadOverlap(map1.x, map1.y, map1.roadWidth) || !gTower.checkOutOfBoundaries())
 		{
 			gt.posiblePlace = false;
 			gt.imagen.src = "img/notAllowed.png";

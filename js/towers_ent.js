@@ -182,6 +182,7 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	}
 	
 	t.checkRoadOverlap = function(arrayX, arrayY,roadWidth){
+		
 		var possible = true;
 		var X1, X2, Y1, Y2;
 		
@@ -193,17 +194,16 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 		
 		if (Y2 < Y1){ // Si el dibujado se de arriba hacia abajo me jode los calculos, por eso tengo que cambiar los nodos, para que se calcule del 
 						//nodo mas arriba en la pantalla al mas abajo de la pantalla (o el de mas a la dcha con el mas a la izq)
-			var aux = Y2 - 2 * t.height;
-			Y2 = Y1 + 2 * t.height;
+			var aux = Y2 - t.height;
+			Y2 = Y1 + t.height;
 			Y1 = aux;
 			}
 		if (X2 < X1){
-			var aux = X2 - 2 * t.width;
-			X2 = X1 + 2 * t.width;
+			var aux = X2 - t.width;
+			X2 = X1 +  t.width;
 			X1 = aux;
 			}
 			if(t.posY > Y1 && t.posY < Y2 && t.posX >  X1 && t.posX < X2 ){
-				
 				possible = false;
 				return possible;
 				}
@@ -213,9 +213,12 @@ var tower = function (id,type, posX,posY,range, color, bulletSpeed, bulletDamage
 	}
 	
 	t.checkOutOfBoundaries = function(){
+		
 		var possible = true;
 		if (t.posX > C_WIDTH - t.width/2 || t.posX < 0 + t.width/2 || t.posY > C_HEIGHT - t.height/2 || t.posY < 0 + t.height/2)
+		{
 			possible = false;
+		}
 		return possible;
 	}
 	

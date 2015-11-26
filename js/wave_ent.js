@@ -27,10 +27,8 @@ var wave = function(id, amountEnemies, spawnTime, enemyPosX, enemyPosY, enemyNex
 		console.log(waves.length);
 		
 		if (waves.length > 1){ //si es la 2da oleada o mas
-		console.log("algo");
 		w.enemyStats.health = waves[0].enemyStats.health * w.healthIncrement;
 		w.enemyStats.gold = Math.round(w.enemyStats.health) * 2;
-		console.log(waves[0].enemyStats.health + " " + w.enemyStats.health);
 		}
 		
 		w.enemyForStats = enemy(w.enemyStats.type, -500, -500, 0, 0, w.enemyStats.spd, w.enemyStats.health, w.enemyStats.gold, w.enemyStats.damage);
